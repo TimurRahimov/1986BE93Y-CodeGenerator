@@ -437,6 +437,12 @@ class Ui_MainWindow(object):
 
         self.verticalLayout_10.addItem(self.horizontalSpacer_5)
 
+        self.label_4 = QLabel(self.tab_3)
+        self.label_4.setObjectName(u"label_4")
+        self.label_4.setAlignment(Qt.AlignCenter)
+
+        self.verticalLayout_10.addWidget(self.label_4)
+
         self.horizontalLayout_23 = QHBoxLayout()
         self.horizontalLayout_23.setObjectName(u"horizontalLayout_23")
         self.horizontalLayout_23.setContentsMargins(50, -1, 50, 0)
@@ -528,6 +534,81 @@ class Ui_MainWindow(object):
         self.tabWidget.addTab(self.tab_3, "")
         self.tab_4 = QWidget()
         self.tab_4.setObjectName(u"tab_4")
+        self.gridLayout_4 = QGridLayout(self.tab_4)
+        self.gridLayout_4.setObjectName(u"gridLayout_4")
+        self.verticalLayout_11 = QVBoxLayout()
+        self.verticalLayout_11.setSpacing(25)
+        self.verticalLayout_11.setObjectName(u"verticalLayout_11")
+        self.verticalLayout_11.setContentsMargins(-1, 20, -1, -1)
+        self.label_17 = QLabel(self.tab_4)
+        self.label_17.setObjectName(u"label_17")
+        sizePolicy.setHeightForWidth(self.label_17.sizePolicy().hasHeightForWidth())
+        self.label_17.setSizePolicy(sizePolicy)
+        self.label_17.setFont(font)
+        self.label_17.setAlignment(Qt.AlignCenter)
+
+        self.verticalLayout_11.addWidget(self.label_17)
+
+        self.verticalLayout_12 = QVBoxLayout()
+        self.verticalLayout_12.setSpacing(10)
+        self.verticalLayout_12.setObjectName(u"verticalLayout_12")
+        self.verticalLayout_12.setContentsMargins(-1, -1, -1, 100)
+        self.horizontalSpacer_6 = QSpacerItem(40, 20, QSizePolicy.Expanding, QSizePolicy.Minimum)
+
+        self.verticalLayout_12.addItem(self.horizontalSpacer_6)
+
+        self.horizontalLayout_25 = QHBoxLayout()
+        self.horizontalLayout_25.setObjectName(u"horizontalLayout_25")
+        self.horizontalLayout_25.setContentsMargins(50, -1, 50, 0)
+        self.checkBox_7_lse = QCheckBox(self.tab_4)
+        self.checkBox_7_lse.setObjectName(u"checkBox_7_lse")
+        self.checkBox_7_lse.setMaximumSize(QSize(100, 16777215))
+
+        self.horizontalLayout_25.addWidget(self.checkBox_7_lse)
+
+        self.comboBox_7_lse = QComboBox(self.tab_4)
+        self.comboBox_7_lse.setObjectName(u"comboBox_7_lse")
+        self.comboBox_7_lse.setEnabled(False)
+
+        self.horizontalLayout_25.addWidget(self.comboBox_7_lse)
+
+
+        self.verticalLayout_12.addLayout(self.horizontalLayout_25)
+
+        self.horizontalLayout_26 = QHBoxLayout()
+        self.horizontalLayout_26.setObjectName(u"horizontalLayout_26")
+        self.horizontalLayout_26.setContentsMargins(50, -1, 50, 0)
+        self.checkBox_7_hse = QCheckBox(self.tab_4)
+        self.checkBox_7_hse.setObjectName(u"checkBox_7_hse")
+        self.checkBox_7_hse.setMaximumSize(QSize(100, 16777215))
+
+        self.horizontalLayout_26.addWidget(self.checkBox_7_hse)
+
+        self.comboBox_7_hse = QComboBox(self.tab_4)
+        self.comboBox_7_hse.setObjectName(u"comboBox_7_hse")
+        self.comboBox_7_hse.setEnabled(False)
+
+        self.horizontalLayout_26.addWidget(self.comboBox_7_hse)
+
+
+        self.verticalLayout_12.addLayout(self.horizontalLayout_26)
+
+        self.submitButton_7 = QPushButton(self.tab_4)
+        self.submitButton_7.setObjectName(u"submitButton_7")
+        sizePolicy3.setHeightForWidth(self.submitButton_7.sizePolicy().hasHeightForWidth())
+        self.submitButton_7.setSizePolicy(sizePolicy3)
+        self.submitButton_7.setMinimumSize(QSize(500, 50))
+        self.submitButton_7.setMaximumSize(QSize(1000, 16777215))
+        self.submitButton_7.setStyleSheet(u"")
+
+        self.verticalLayout_12.addWidget(self.submitButton_7, 0, Qt.AlignHCenter)
+
+
+        self.verticalLayout_11.addLayout(self.verticalLayout_12)
+
+
+        self.gridLayout_4.addLayout(self.verticalLayout_11, 0, 0, 1, 1)
+
         self.tabWidget.addTab(self.tab_4, "")
         self.tab_5 = QWidget()
         self.tab_5.setObjectName(u"tab_5")
@@ -588,6 +669,7 @@ class Ui_MainWindow(object):
         self.submitButton_5.setText(QCoreApplication.translate("MainWindow", u"\u041f\u043e\u0435\u0445\u0430\u043b\u0438!", None))
         self.tabWidget.setTabText(self.tabWidget.indexOf(self.tab_11), QCoreApplication.translate("MainWindow", u"SysTick", None))
         self.label_16.setText(QCoreApplication.translate("MainWindow", u"LSI / HSI", None))
+        self.label_4.setText(QCoreApplication.translate("MainWindow", u"\u041f\u043e\u0434\u0431\u0435\u0440\u0438\u0442\u0435 \u043a\u043e\u044d\u0444\u0444\u0438\u0446\u0438\u0435\u043d\u0442\u044b LSITRIM \u0438 HSITRIM \u0434\u043b\u044f \u0432\u0430\u0448\u0435\u0433\u043e \u0432\u0430\u0440\u0438\u0430\u043d\u0442\u0430 \u043d\u0430 \u043e\u0441\u043d\u043e\u0432\u0430\u043d\u0438\u0438 \u0433\u0440\u0430\u0444\u0438\u043a\u043e\u0432", None))
         self.checkBox_6_lsi.setText(QCoreApplication.translate("MainWindow", u"LSI", None))
         self.label_6_lsi.setText(QCoreApplication.translate("MainWindow", u"LSITRIM", None))
         self.pushButton_6_show_lsi.setText(QCoreApplication.translate("MainWindow", u"\u0413\u0440\u0430\u0444\u0438\u043a", None))
@@ -596,6 +678,10 @@ class Ui_MainWindow(object):
         self.pushButton_6_show_hsi.setText(QCoreApplication.translate("MainWindow", u"\u0413\u0440\u0430\u0444\u0438\u043a", None))
         self.submitButton_6.setText(QCoreApplication.translate("MainWindow", u"\u041f\u043e\u0435\u0445\u0430\u043b\u0438!", None))
         self.tabWidget.setTabText(self.tabWidget.indexOf(self.tab_3), QCoreApplication.translate("MainWindow", u"LSI / HSI", None))
+        self.label_17.setText(QCoreApplication.translate("MainWindow", u"LSE / HSE", None))
+        self.checkBox_7_lse.setText(QCoreApplication.translate("MainWindow", u"LSE", None))
+        self.checkBox_7_hse.setText(QCoreApplication.translate("MainWindow", u"HSE", None))
+        self.submitButton_7.setText(QCoreApplication.translate("MainWindow", u"\u041f\u043e\u0435\u0445\u0430\u043b\u0438!", None))
         self.tabWidget.setTabText(self.tabWidget.indexOf(self.tab_4), QCoreApplication.translate("MainWindow", u"LSE / HSE", None))
         self.tabWidget.setTabText(self.tabWidget.indexOf(self.tab_5), QCoreApplication.translate("MainWindow", u"CPU_CLK", None))
         self.tabWidget.setTabText(self.tabWidget.indexOf(self.tab_6), QCoreApplication.translate("MainWindow", u"USB_CLK", None))
