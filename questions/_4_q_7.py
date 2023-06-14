@@ -60,11 +60,17 @@ class Q7(Q6):
 
         if lse_type:
             code += f"    RST_CLK_LSEconfig({lse_type});\n"
+            code += f"    if(RST_CLK_LSEstatus() == ERROR)\n"
+            code += f"        RST_CLK_LSE_config(RST_CLK_LSE_OFF);\n"
+            code += "    else { }\n\n"
 
         if hse_type:
             code += f"    RST_CLK_HSEconfig({hse_type});\n"
+            code += f"    if(RST_CLK_HSEstatus() == ERROR)\n"
+            code += f"        RST_CLK_HSE_config(RST_CLK_HSE_OFF);\n"
+            code += "    else { }\n\n"
 
-        code += ("\n    while(1) { }\n"
+        code += ("    while(1) { }\n"
                  "}\n")
         return code
 
@@ -73,26 +79,33 @@ class Q7(Q6):
         code += "int main(void) {\n"
 
         if lse_type:
-            match lse_type.split('_')[-1]:
-                case 'OFF':
-                    code += f"    MDR_RST_CLK->HS_CONTROL &= ~3; \n"
-                case 'ON':
+            lse_type = lse_type.split('_')[-1]
+            if lse_type == 'OFF':
+                code += f"    MDR_RST_CLK->HS_CONTROL &= ~3; \n"
+            if lse_type in ('ON', 'Bypass'):
+                if lse_type == 'ON':
                     code += f"    MDR_RST_CLK->HS_CONTROL |= 1; \n"
-                case 'Bypass':
+                if lse_type == 'Bypass':
                     code += f"    MDR_RST_CLK->HS_CONTROL |= 3; \n"
-                case _:
-                    pass
+
+                code += f"    if(!(MDR_BKP->REG_0F & 1 << 13))\n"
+                code += f"        MDR_BKP->REG_0F &=~1;\n"
+                code += "    else { }\n\n"
 
         if hse_type:
-            match hse_type.split('_')[-1]:
-                case 'OFF':
-                    code += f"    MDR_BKP->REG_0F &= ~3; \n"
-                case 'ON':
+            hse_type = hse_type.split('_')[-1]
+            if hse_type == 'OFF':
+                code += f"    MDR_BKP->REG_0F &= ~3; \n"
+            if hse_type in ('ON', 'Bypass'):
+                if hse_type == 'ON':
                     code += f"    MDR_BKP->REG_0F |= 1; \n"
-                case 'Bypass':
+                if hse_type == 'Bypass':
                     code += f"    MDR_BKP->REG_0F |= 3; \n"
 
-        code += ("\n    while(1) { }\n"
+                code += f"    if(!(MDR_RST_CLK->CLOCK_STATUS & 4)) \n"
+                code += f"        MDR_RST_CLK->HS_CONTROL &=~1; \n"
+                code += "    else { } \n\n"
+
+        code += ("    while(1) { }\n"
                  "}\n")
         return code
-
