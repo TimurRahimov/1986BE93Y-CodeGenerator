@@ -1,0 +1,6 @@
+<RCC>
+  <qresource prefix="img">
+    <file alias="LSITRIM">data/LSITRIM.png</file>
+    <file alias="HSITRIM">data/HSITRIM.png</file>
+  </qresource>
+</RCC>
