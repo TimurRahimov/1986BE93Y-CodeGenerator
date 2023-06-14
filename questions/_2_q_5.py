@@ -74,7 +74,7 @@ class Q5(Q12):
         if lsi:
             code += "\n"
 
-        code += ("    while(1) { }\n"
+        code += ("\n    while(1) { }\n"
                  "}\n\n")
 
         if isr == 'Инверсия вывода':
@@ -112,7 +112,7 @@ class Q5(Q12):
                  "    NVIC_SetPriority (SysTick_IRQn, (1<<__NVIC_PRIO_BITS) - 1);\n"
                  "    SysTick->VAL = 0;\n"
                  f"    SysTick->CTRL = ({'0' if lsi else '1'} << 2) | (1 << 1) | (1 << 0);\n"
-                 "    while(1) { }\n"
+                 "\n    while(1) { }\n"
                  "}\n\n")
 
         if isr == 'Инверсия вывода':

@@ -59,29 +59,37 @@ class Q6(Q5):
         self.show_code(with_func=func, with_reg=reg)
 
     def __6_create_func_code(self, lsitrim: str = None, hsitrim: str = None) -> str:
-        code = ""
+        code = ("""#include "MDR32F9Qx_port.h" \n"""
+                """#include "MDR32F9Qx_rst_clk.h" \n\n """)
+
+        code += "int main(void) {\n"
         if lsitrim:
-            code += f"RST_CLK_LSIadjust({lsitrim});\n"
+            code += f"    RST_CLK_LSIadjust({lsitrim});\n"
 
         if hsitrim:
-            code += f"RST_CLK_HSIadjust({hsitrim});\n"
+            code += f"    RST_CLK_HSIadjust({hsitrim});\n"
 
+        code += ("\n    while(1) { }\n"
+                 "}\n")
         return code
 
     def __6_create_reg_code(self, lsitrim: str = None, hsitrim: str = None) -> str:
-        code = ""
+        code = """#include "MDR32Fx.h" \n\n"""
+        code += "int main(void) {\n"
         if lsitrim:
-            code += ("uint32_t lsi_temp;\n"
-                     "lsi_temp = MDR_BKP->REG_0F;\n"
-                     "lsi_temp &= ~((uint32_t)(0x1F << 16)); // Очистить биты LSITRIM [4:0]\n"
-                     f"lsi_temp |= (uint32_t) {lsitrim} << 16;\n"
-                     f"MDR_BKP->REG_0F = lsi_temp;\n\n")
+            code += ("    uint32_t lsi_temp;\n"
+                     "    lsi_temp = MDR_BKP->REG_0F;\n"
+                     "    lsi_temp &= ~((uint32_t)(0x1F << 16)); // Очистить биты LSITRIM [4:0]\n"
+                     f"    lsi_temp |= (uint32_t) {lsitrim} << 16;\n"
+                     f"    MDR_BKP->REG_0F = lsi_temp;\n\n")
 
         if hsitrim:
-            code += ("uint32_t hsi_temp;\n"
-                     "hsi_temp = MDR_BKP->REG_0F;\n"
-                     "hsi_temp &= ~((uint32_t)(0x3F << 24)); // Очистить биты HSITRIM [5:0]\n"
-                     f"hsi_temp |= (uint32_t) {hsitrim} << 24;\n"
-                     f"MDR_BKP->REG_0F = hsi_temp;\n\n")
+            code += ("    uint32_t hsi_temp;\n"
+                     "    hsi_temp = MDR_BKP->REG_0F;\n"
+                     "    hsi_temp &= ~((uint32_t)(0x3F << 24)); // Очистить биты HSITRIM [5:0]\n"
+                     f"    hsi_temp |= (uint32_t) {hsitrim} << 24;\n"
+                     f"    MDR_BKP->REG_0F = hsi_temp;\n\n")
 
+        code += ("    while(1) { }\n"
+                 "}\n")
         return code
