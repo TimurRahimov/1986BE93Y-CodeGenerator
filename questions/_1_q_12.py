@@ -61,7 +61,7 @@ port_struct_fields = {
     "gfen": ("PORT_GFEN", "GFEN")
 }
 
-port_func = {
+port_funcs = {
     "A": {
         "0": {
             "EXT_INT1": 2
@@ -243,7 +243,7 @@ class Q12(Malakhanov):
         name = self.ui.lineEdit_12_func.text().upper()
 
         try:
-            pos = port_func[port][pin][name]
+            pos = port_funcs[port][pin][name]
         except KeyError:
             self.ui.func_label_12.setText("Вы ввели неверную функцию")
             return
@@ -266,7 +266,7 @@ class Q12(Malakhanov):
         code += f"    RST_CLK_PCLKcmd(RST_CLK_PCLK_PORT{port}, ENABLE);\n"
 
         try:
-            for func, func_num in port_func[port][pin].items():
+            for func, func_num in port_funcs[port][pin].items():
                 if func_num == self.ui.comboBox_12_func.currentIndex():
                     if func.startswith('TMR'):
                         code += f"    RST_CLK_PCLKcmd(RST_CLK_PCLK_TIMER{func[3]}, ENABLE);\n"
@@ -302,7 +302,7 @@ class Q12(Malakhanov):
         per_clock = [f"(1 << {pclk[f'PORT{port}']})"]
 
         try:
-            for func, func_num in port_func[port][str(pin)].items():
+            for func, func_num in port_funcs[port][str(pin)].items():
                 if func_num == self.ui.comboBox_12_func.currentIndex():
                     if func.startswith('TMR'):
                         per_clock.append(f"(1 << {pclk[f'TIMER{func[3]}']})")

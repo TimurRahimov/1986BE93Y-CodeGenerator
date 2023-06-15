@@ -102,10 +102,11 @@ class Q8(Q7):
 
     def __8_create_func_code(self, num: int, denum: int, hse_freq: int, latency_level: int) -> str:
 
-        code = (f"RST_CLK_HSEconfig(RST_CLK_HSE_ON); // Запуск HSE, fHSE={hse_freq / (10 ** 6)} МГц\n"
+        code = (f"RST_CLK_HSEconfig(RST_CLK_HSE_ON); // Запуск HSE, fHSE={int(hse_freq / (10 ** 6))} МГц\n"
                 "if (RST_CLK_HSEstatus() == ERROR)\n"
                 "    RST_CLK_HSEconfig(RST_CLK_HSE_OFF); // HSE не запустился – выключение HSE\n"
                 "else // HSE запустился и работает стабильно\n"
+                "{\n"
                 f"    // Первый мультиплексор, CPU_C1 = HSE, PLLCPUMUL = {num - 1}\n"
                 f"    RST_CLK_CPU_PLLconfig(RST_CLK_CPU_PLLsrcHSEdiv1, RST_CLK_CPU_PLLmul{num});\n"
                 "    RST_CLK_CPU_PLLcmd(ENABLE); // Включение схемы умножения частоты\n"
@@ -120,6 +121,7 @@ class Q8(Q7):
                 "    }\n"
                 f"    RST_CLK_CPUclkPrescaler(RST_CLK_CPUclkDIV{denum}); // N = {denum}\n"
                 "    RST_CLK_CPUclkSelection(RST_CLK_CPUclkCPU_C3); // Третий мультиплексор, fHCLK=fCPU_C3\n"
+                "}\n"
                 )
 
         return code
