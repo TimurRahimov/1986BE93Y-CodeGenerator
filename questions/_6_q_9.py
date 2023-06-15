@@ -149,7 +149,7 @@ class Q9(Q8):
                 "}\n"
                 "else // // HSE запустился и работает стабильно\n"
                 "{\n"
-                "    // Запуск схемы умножения частоты CPU_PLL\n"
+                "    // Запуск схемы умножения частоты USB_PLL\n"
                 "    MDR_RST_CLK->PLL_CONTROL &= ~0xF0; // Сброс PLLUSBMUL\n"
                 f"    MDR_RST_CLK->PLL_CONTROL |= 1 | ({num - 1} << 4); // PLLUSBON = 1, PLLUSBMUL = {num - 1}\n"
                 "    if(MDR_RST_CLK->CLOCK_STATUS & 1)\n"
