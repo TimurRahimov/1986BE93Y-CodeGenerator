@@ -314,7 +314,8 @@ class Q12(Malakhanov):
         for _ in settings:
             box: QComboBox = self.ui.__dict__["comboBox_12_" + _]
             if box.isEnabled():
-                code += f"    MDR_PORT{port}->{port_struct_fields[_][1]} = ({settings[_][box.currentText()][1]} << {pin if _ != 'func' else pin * 2});\n"
+                code += (f"    MDR_PORT{port}->{port_struct_fields[_][1]} = "
+                         f"({settings[_][box.currentText()][1]} << {pin if _ not in ('func', 'pwr') else pin * 2});\n")
 
         pull_down = self.ui.checkBox_12_pull_down.isChecked()
         pull_up = self.ui.checkBox_12_pull_up.isChecked()

@@ -6,6 +6,24 @@ from ui import Ui_MainWindow
 
 class Malakhanov(QMainWindow):
 
+    pclk = {
+        "RST_CLK": 4,
+        "UART1": 6,
+        "UART2": 7,
+        "TIMER1": 14,
+        "TIMER2": 15,
+        "TIMER3": 16,
+        "ADC": 17,
+        "DAC": 18,
+        "PORTA": 21,
+        "PORTB": 22,
+        "PORTC": 23,
+        "PORTD": 24,
+        "PORTE": 25,
+        "BKP": 27,
+        "PORTF": 29,
+    }
+
     port_settings = {
         "pin": list(map(str, range(16))),
         "port": [

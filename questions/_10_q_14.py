@@ -32,6 +32,7 @@ class PwmSettings:
     arr: int
     psg: int
     ccry: int
+    inv: bool
 
 
 class Q14(Q13):
@@ -124,18 +125,26 @@ class Q14(Q13):
         arr = int(self.ui.lineEdit_14_arr.text())
         psg = int(self.ui.lineEdit_14_psg.text())
         ccry = int(self.ui.lineEdit_14_ccry.text())
+        inv = settings["inv"][self.ui.comboBox_14_pwm_inv.currentText()]
 
         pwm_set = PwmSettings(port=port, pin=pin, tmr=tmr, ch=ch, pwm_port=pwm_port, pwm_time=pwm_time,
-                              impuls_time=impuls_time, mk_freq=mk_freq, m=m, arr=arr, psg=psg, ccry=ccry)
+                              impuls_time=impuls_time, mk_freq=mk_freq, m=m, arr=arr, psg=psg, ccry=ccry, inv=inv)
 
         func = self.__14_create_func_code(pwm_set)
+        reg = self.__14_create_reg_code(pwm_set)
 
-        self.show_code(with_func=func)
+        self.show_code(with_func=func, with_reg=reg)
 
     def __14_create_func_code(self, pwm_set: PwmSettings) -> str:
+
+        pwm_dir = 'Neg' if pwm_set.pwm_port[-1] == 'N' else 'Dir'
+
         code = ("""#include "MDR32Fx.h" \n"""
                 """#include "MDR32F9Qx_timer.h" \n"""
-                """#include "MDR32F9Qx_port.h" \n"""
+                """#include "MDR32F9Qx_port.h" \n\n"""
+                f"#define arr {pwm_set.arr} \n"
+                f"#define psg {pwm_set.psg} \n"
+                f"#define ccr {pwm_set.ccry} \n\n"
                 "int main(void)\n"
                 "{\n")
 
@@ -156,6 +165,82 @@ class Q14(Q13):
             f"    PORT_InitStructure.PORT_FUNC = {func};\n"
             "    PORT_InitStructure.PORT_MODE = PORT_MODE_DIGITAL;\n"
             "    PORT_InitStructure.PORT_SPEED = PORT_SPEED_FAST;\n"
-            f"    PORT_Init(MDR_PORT{pwm_set.port}, &PORT_InitStructure);\n")
+            f"    PORT_Init(MDR_PORT{pwm_set.port}, &PORT_InitStructure);\n\n"
+            f"    /* Настройка {pwm_set.ch} канала таймера {pwm_set.tmr} для работы в режиме ШИМ */\n"
+            "    TIMER_ChnStructInit(&s);\n"
+            f"    s.TIMER_CH_Number = TIMER_CHANNEL{pwm_set.ch};\n"
+            "    s.TIMER_CH_REF_Format = TIMER_CH_REF_Format6;\n"
+            f"    TIMER_ChnInit(MDR_TIMER{pwm_set.tmr}, &s);\n\n"
+            f"    /* Запись значений в регистры CCR */\n"
+            f"    TIMER_SetChnCompare(MDR_TIMER{pwm_set.tmr}, TIMER_CHANNEL{pwm_set.ch}, ccr);\n\n"
+            f"    /* Настройка выхода {pwm_set.ch} канала таймера {pwm_set.tmr} */\n"
+            f"    sOut.TIMER_CH_{pwm_dir}Out_Polarity = TIMER_CHOPolarity_{'' if pwm_set.inv else 'Non'}Inverted;\n"
+            f"    sOut.TIMER_CH_{pwm_dir}Out_Source = TIMER_CH_OutSrc_REF;\n"
+            f"    sOut.TIMER_CH_{pwm_dir}Out_Mode = TIMER_CH_OutMode_Output;\n"
+            f"    sOut.TIMER_CH_Number = TIMER_CHANNEL{pwm_set.ch};\n"
+            f"    TIMER_ChnOutInit(MDR_TIMER{pwm_set.tmr}, &sOut);\n\n"
+            f""
+            f"    TIMER_SetCntPrescaler(MDR_TIMER{pwm_set.tmr}, psg);\n"
+            f"    TIMER_SetCntAutoreload(MDR_TIMER{pwm_set.tmr}, arr);\n"
+            f"    TIMER_Cmd(MDR_TIMER{pwm_set.tmr}, ENABLE);\n\n"
+            "    while(1) { }\n"
+            "}\n")
+
+        return code
+
+    def __14_create_reg_code(self, pwm_set: PwmSettings) -> str:
+
+        code = ("""#include "MDR32Fx.h" \n\n"""
+                f"#define arr {pwm_set.arr} \n"
+                f"#define psg {pwm_set.psg} \n"
+                f"#define ccr {pwm_set.ccry} \n\n"
+                "int main(void)\n"
+                "{\n")
+
+        per_clock = [f"(1 << {self.pclk[f'PORT{pwm_set.port}']})"]
+
+        try:
+            for func, func_num in self.port_funcs[pwm_set.port][pwm_set.pin].items():
+                if func == pwm_set.pwm_port:
+                    if func.startswith('TMR'):
+                        per_clock.append(f"(1 << {self.pclk[f'TIMER{func[3]}']})")
+        except KeyError:
+            pass
+
+        func = self.port_funcs[pwm_set.port][pwm_set.pin][pwm_set.pwm_port]
+        cntrl1 = 0
+        if pwm_set.pwm_port[-1] == 'N':
+            cntrl1 |= 1 << 8
+            cntrl1 |= 2 << 10
+            if pwm_set.inv:
+                cntrl1 |= 1 << 12
+        else:
+            cntrl1 |= 1
+            cntrl1 |= 2 << 2
+            if pwm_set.inv:
+                cntrl1 |= 1 << 4
+
+        code += (f"    /* Разрешение тактирования таймера {pwm_set.tmr} и порта {pwm_set.port} */\n"
+                 f"    MDR_RST_CLK->PER_CLOCK |= {' | '.join(per_clock)};\n"
+                 "    /* Разрешение тактирования таймера 1 и установка значения М = 1 */\n"
+                 f"    MDR_RST_CLK->TIM_CLOCK = 1 << {23 + int(pwm_set.tmr)};\n\n"
+                 f"    /* Настройка вывода {pwm_set.pin} порта {pwm_set.port} для работы в режиме цифрового вывода */\n"
+                 f"    MDR_PORT{pwm_set.port}->OE = (1 << {pwm_set.pin});\n"
+                 f"    MDR_PORT{pwm_set.port}->FUNC = ({func} << {pwm_set.pin * 2});\n"
+                 f"    MDR_PORT{pwm_set.port}->ANALOG = (1 << {pwm_set.pin});\n"
+                 f"    MDR_PORT{pwm_set.port}->PWR = (3 << {pwm_set.pin * 2});\n\n"
+                 f"    /* Настройка {pwm_set.ch} канала таймера {pwm_set.tmr} для работы в режиме ШИМ */\n"
+                 f"    MDR_TIMER{pwm_set.tmr}->CH{pwm_set.ch}_CNTRL = 0xC00;\n\n"
+                 f"    /* Запись значений в регистры CCR */\n"
+                 f"    MDR_TIMER{pwm_set.tmr}->CCR{pwm_set.ch} = ccr;\n\n"
+                 f"    /* Настройка выхода {pwm_set.ch} канала таймера {pwm_set.tmr} */\n"
+                 f"    MDR_TIMER{pwm_set.tmr}->CH{pwm_set.ch}_CNTRL1 = {hex(cntrl1)}; // {bin(cntrl1)}\n\n"
+                 f"    / * Настройка и запуск таймера {pwm_set.tmr} * /"
+                 f"    MDR_TIMER{pwm_set.tmr}->PSG = psg;\n"
+                 f"    MDR_TIMER{pwm_set.tmr}->ARR = arr;\n"
+                 f"    MDR_TIMER{pwm_set.tmr}->CNTRL |= 1;\n\n"
+                 "    while (1) { }\n"
+                 "}\n"
+                 )
 
         return code
