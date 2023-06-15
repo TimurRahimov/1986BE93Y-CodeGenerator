@@ -15,7 +15,7 @@ settings = {
         "ГГц": 10 ** 9
     },
     "isr": {
-        "Инверсия вывода"
+        "Инверсия выхода"
     }
 }
 
@@ -77,7 +77,7 @@ class Q5(Q12):
         code += ("\n    while(1) { }\n"
                  "}\n\n")
 
-        if isr == 'Инверсия вывода':
+        if isr == 'Инверсия выхода':
             code += ("void SysTick_Handler(void) {\n"
                      "    if (++Counter & 1)\n"
                      f"        PORT_SetBits(MDR_PORT{port}, PORT_Pin_{pin});\n"
@@ -115,7 +115,7 @@ class Q5(Q12):
                  "\n    while(1) { }\n"
                  "}\n\n")
 
-        if isr == 'Инверсия вывода':
+        if isr == 'Инверсия выхода':
             code += ("void SysTick_Handler(void) {\n"
                      f"    MDR_PORT{port}->RXTX ^= (1 << {pin});\n"
                      "}\n\n")
