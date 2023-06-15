@@ -133,6 +133,8 @@ class Q14(Q13):
         func = self.__14_create_func_code(pwm_set)
         reg = self.__14_create_reg_code(pwm_set)
 
+        self.show_code(with_func=func, with_reg=reg)
+
     def __14_create_func_code(self, pwm_set: PwmSettings) -> str:
 
         pwm_dir = 'Neg' if pwm_set.pwm_port[-1] == 'N' else 'Dir'
