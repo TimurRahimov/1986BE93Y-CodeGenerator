@@ -273,20 +273,20 @@ class Q12(Malakhanov):
         except KeyError:
             pass
 
-        code += f"    PORT_DeInit(MDR_PORT{port});\n"
+        code += f"    PORT_DeInit(MDR_PORT{port}); // Сброс всех регистров управления портом\n"
         code += f"    PortInit.PORT_Pin = PORT_Pin_{pin};\n"
 
         for _ in settings:
             box: QComboBox = self.ui.__dict__["comboBox_12_" + _]
             if box.isEnabled():
-                code += f"    PortInit.{port_struct_fields[_][0]} = {settings[_][box.currentText()][0]}; \n"
+                code += f"    PortInit.{port_struct_fields[_][0]} = {settings[_][box.currentText()][0]}; // [с. 22-23] Порты_МК_1986ВЕ93У\n"
 
         for _ in checkbox_settings:
             box: QCheckBox = self.ui.__dict__["checkBox_12_" + _]
             if box.isChecked():
-                code += f"    PortInit.{port_struct_fields[_][0]} = {checkbox_settings[_][True]}; \n"
+                code += f"    PortInit.{port_struct_fields[_][0]} = {checkbox_settings[_][True]}; // [с. 22-23] Порты_МК_1986ВЕ93У\n"
 
-        code += (f"    PORT_Init(MDR_PORT{port}, &PortInit);\n"
+        code += (f"    PORT_Init(MDR_PORT{port}, &PortInit); // Настройка порта с помощью структуры\n"
                  "\n"
                  "    while(1) { }\n"
                  "}\n")
@@ -300,22 +300,27 @@ class Q12(Malakhanov):
         code += "int main(void){\n"
 
         per_clock = [f"(1 << {pclk[f'PORT{port}']})"]
+        tmr = None
 
         try:
             for func, func_num in port_funcs[port][str(pin)].items():
                 if func_num == self.ui.comboBox_12_func.currentIndex():
                     if func.startswith('TMR'):
-                        per_clock.append(f"(1 << {pclk[f'TIMER{func[3]}']})")
+                        tmr = f'TIMER{func[3]}'
+                        per_clock.append(f"(1 << {pclk[tmr]})")
         except KeyError:
             pass
 
-        code += f"    MDR_RST_CLK->PER_CLOCK |= {' | '.join(per_clock)};\n"
+        code += (f"    // [c. 175] Спецификации: Разрешение тактирования PORT{port} - {pclk[f'PORT{port}']} "
+                 f"{'' if len(per_clock) == 1 else f'и {tmr} - {pclk[tmr]}'}\n"
+                 f"    MDR_RST_CLK->PER_CLOCK |= {' | '.join(per_clock)};\n")
 
         for _ in settings:
             box: QComboBox = self.ui.__dict__["comboBox_12_" + _]
             if box.isEnabled():
                 code += (f"    MDR_PORT{port}->{port_struct_fields[_][1]} = "
-                         f"({settings[_][box.currentText()][1]} << {pin if _ not in ('func', 'pwr') else pin * 2});\n")
+                         f"({settings[_][box.currentText()][1]} << {pin if _ not in ('func', 'pwr') else pin * 2});"
+                         f" // [с. 8-16] Порты_МК_1986ВЕ93У\n")
 
         pull_down = self.ui.checkBox_12_pull_down.isChecked()
         pull_up = self.ui.checkBox_12_pull_up.isChecked()
@@ -324,20 +329,20 @@ class Q12(Malakhanov):
         shm = self.ui.checkBox_12_shm.isChecked()
 
         if pull_up and pull_down:
-            code += f"    MDR_PORT{port}->PULL = (1 << {pin}) | (1 << {pin + 16});\n"
+            code += f"    MDR_PORT{port}->PULL = (1 << {pin}) | (1 << {pin + 16}); // [с. 15] Порты_МК_1986ВЕ93У\n"
         elif pull_up:
-            code += f"    MDR_PORT{port}->PULL = (1 << {pin + 16});\n"
+            code += f"    MDR_PORT{port}->PULL = (1 << {pin + 16}); // [с. 15] Порты_МК_1986ВЕ93У\n"
         elif pull_down:
-            code += f"    MDR_PORT{port}->PULL = (1 << {pin});\n"
+            code += f"    MDR_PORT{port}->PULL = (1 << {pin}); // [с. 15] Порты_МК_1986ВЕ93У\n"
 
         if pd_open and shm:
-            code += f"    MDR_PORT{port}->PD = (1 << {pin}) | (1 << {pin + 16});\n"
+            code += f"    MDR_PORT{port}->PD = (1 << {pin}) | (1 << {pin + 16}); // [с. 16] Порты_МК_1986ВЕ93У\n"
         elif pd_open:
-            code += f"    MDR_PORT{port}->PD = (1 << {pin + 16});\n"
+            code += f"    MDR_PORT{port}->PD = (1 << {pin + 16}); // [с. 16] Порты_МК_1986ВЕ93У\n"
         elif shm:
-            code += f"    MDR_PORT{port}->PD = (1 << {pin});\n"
+            code += f"    MDR_PORT{port}->PD = (1 << {pin}); // [с. 16] Порты_МК_1986ВЕ93У\n"
         if gfen:
-            code += f"    MDR_PORT{port}->GFEN = (1 << {pin});\n"
+            code += f"    MDR_PORT{port}->GFEN = (1 << {pin}); // [с. 17] Порты_МК_1986ВЕ93У\n"
 
         code += ("\n    while(1) { }\n"
                  "}\n")
