@@ -140,8 +140,9 @@ class Q14(Q13):
         pwm_dir = 'Neg' if pwm_set.pwm_port[-1] == 'N' else 'Dir'
 
         code = ("""#include "MDR32Fx.h" \n"""
+                """#include "MDR32F9Qx_port.h" \n"""
+                """#include "MDR32F9Qx_rst_clk.h" \n\n"""
                 """#include "MDR32F9Qx_timer.h" \n"""
-                """#include "MDR32F9Qx_port.h" \n\n"""
                 f"#define arr {pwm_set.arr} \n"
                 f"#define psg {pwm_set.psg} \n"
                 f"#define ccr {pwm_set.ccry} \n\n"
@@ -235,7 +236,7 @@ class Q14(Q13):
                  f"    MDR_TIMER{pwm_set.tmr}->CCR{pwm_set.ch} = ccr;\n\n"
                  f"    /* Настройка выхода {pwm_set.ch} канала таймера {pwm_set.tmr} */\n"
                  f"    MDR_TIMER{pwm_set.tmr}->CH{pwm_set.ch}_CNTRL1 = {hex(cntrl1)}; // {bin(cntrl1)}\n\n"
-                 f"    / * Настройка и запуск таймера {pwm_set.tmr} * /"
+                 f"    /* Настройка и запуск таймера {pwm_set.tmr} */\n"
                  f"    MDR_TIMER{pwm_set.tmr}->PSG = psg;\n"
                  f"    MDR_TIMER{pwm_set.tmr}->ARR = arr;\n"
                  f"    MDR_TIMER{pwm_set.tmr}->CNTRL |= 1;\n\n"
