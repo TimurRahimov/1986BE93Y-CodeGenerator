@@ -1,6 +1,8 @@
 # Генератор кода для настройки микроконтроллера Миландр 1986ВЕ93У
 
-<img width="600" src="data\Generator_Example.png"/>
+<p align="center">
+  <img width="55%" src="data\Generator_Example.png"/>
+</p>
 
 Данная программа предназначена для настройки:
 - Портов микроконтроллера
@@ -15,4 +17,6 @@
 
 Для генерации кода необходимо сконфигурировать соответствующую настройку, после чего нажать на кнопку "Поехали!"
 
-<img width="600" src="data\Generator_Example2.png"/>
+<p align="center">
+  <img width="80%" src="data\Generator_Example2.png"/>
+</p>
