@@ -1019,6 +1019,27 @@ class Ui_MainWindow(object):
         self.verticalLayout_18.setSpacing(10)
         self.verticalLayout_18.setObjectName(u"verticalLayout_18")
         self.verticalLayout_18.setContentsMargins(-1, -1, -1, 100)
+        self.horizontalLayout_53 = QHBoxLayout()
+        self.horizontalLayout_53.setObjectName(u"horizontalLayout_53")
+        self.horizontalLayout_53.setContentsMargins(0, -1, 0, 0)
+        self.label_60 = QLabel(self.tab_7)
+        self.label_60.setObjectName(u"label_60")
+        self.label_60.setMinimumSize(QSize(400, 0))
+        self.label_60.setMaximumSize(QSize(100, 16777215))
+        self.label_60.setAlignment(Qt.AlignCenter)
+
+        self.horizontalLayout_53.addWidget(self.label_60)
+
+        self.comboBox_10_source = QComboBox(self.tab_7)
+        self.comboBox_10_source.setObjectName(u"comboBox_10_source")
+        self.comboBox_10_source.setEnabled(True)
+        self.comboBox_10_source.setMaximumSize(QSize(16777215, 16777215))
+
+        self.horizontalLayout_53.addWidget(self.comboBox_10_source)
+
+
+        self.verticalLayout_18.addLayout(self.horizontalLayout_53)
+
         self.horizontalSpacer_12 = QSpacerItem(40, 20, QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Minimum)
 
         self.verticalLayout_18.addItem(self.horizontalSpacer_12)
@@ -1893,10 +1914,10 @@ class Ui_MainWindow(object):
         self.label_36.setText(QCoreApplication.translate("MainWindow", u"\u0417\u043d\u0430\u043c\u0435\u043d\u0430\u0442\u0435\u043b\u044c", None))
         self.submitButton_9.setText(QCoreApplication.translate("MainWindow", u"\u041f\u043e\u0435\u0445\u0430\u043b\u0438!", None))
         self.tabWidget.setTabText(self.tabWidget.indexOf(self.tab_6), QCoreApplication.translate("MainWindow", u"USB_CLK", None))
-        self.label_37.setText(QCoreApplication.translate("MainWindow", u"ADC_CLK (CPU/USB/LSE/LSI)", None))
-        self.label_38.setText(QCoreApplication.translate("MainWindow", u"fHSE = 8 \u041c\u0413\u0446 (\u0435\u0441\u043b\u0438 \u044d\u0442\u043e \u043d\u0435 \u0442\u0430\u043a, \u0438\u0441\u043f\u0440\u0430\u0432\u044c\u0442\u0435 \u0437\u043d\u0430\u0447\u0435\u043d\u0438\u0435 \u043d\u0438\u0436\u0435)\n"
-"fUSB = 48 \u041c\u0413\u0446 (\u0435\u0441\u043b\u0438 \u044d\u0442\u043e \u043d\u0435 \u0442\u0430\u043a, \u0438\u0441\u043f\u0440\u0430\u0432\u044c\u0442\u0435 \u0437\u043d\u0430\u0447\u0435\u043d\u0438\u0435 \u043d\u0438\u0436\u0435)", None))
-        self.checkBox_10_nhse.setText(QCoreApplication.translate("MainWindow", u"\u0434\u0440\u0443\u0433\u0430\u044f \u0447\u0430\u0441\u0442\u043e\u0442\u0430", None))
+        self.label_37.setText(QCoreApplication.translate("MainWindow", u"ADC_CLK", None))
+        self.label_60.setText(QCoreApplication.translate("MainWindow", u"\u0418\u0441\u0442\u043e\u0447\u043d\u0438\u043a", None))
+        self.label_38.setText(QCoreApplication.translate("MainWindow", u"\u043f\u043e \u0443\u043c\u043e\u043b\u0447\u0430\u043d\u0438\u044e 48 \u041c\u0413\u0446 (\u0435\u0441\u043b\u0438 \u044d\u0442\u043e \u043d\u0435 \u0442\u0430\u043a, \u0438\u0441\u043f\u0440\u0430\u0432\u044c\u0442\u0435 \u0437\u043d\u0430\u0447\u0435\u043d\u0438\u0435 \u043d\u0438\u0436\u0435)", None))
+        self.checkBox_10_nhse.setText(QCoreApplication.translate("MainWindow", u"\u0427\u0430\u0441\u0442\u043e\u0442\u0430 \u0438\u0441\u0442\u043e\u0447\u043d\u0438\u043a\u0430", None))
         self.lineEdit_10_nhse.setText("")
         self.label_39.setText(QCoreApplication.translate("MainWindow", u"\u0412\u044b\u0431\u0435\u0440\u0438\u0442\u0435 \u043e\u0434\u043d\u0443 \u0438\u0437 \u0444\u043e\u0440\u043c \u0438\u0441\u0445\u043e\u0434\u043d\u044b\u0445 \u0434\u0430\u043d\u043d\u044b\u0445 \u0438 \u0432\u0432\u0435\u0434\u0438\u0442\u0435 \u0438\u0445", None))
         self.checkBox_10_freq.setText(QCoreApplication.translate("MainWindow", u"\u0414\u0430\u043d\u0430 \u0447\u0430\u0441\u0442\u043e\u0442\u0430", None))
