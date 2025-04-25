@@ -3,7 +3,7 @@
 ################################################################################
 ## Form generated from reading UI file 'main.ui'
 ##
-## Created by: Qt User Interface Compiler version 6.5.1
+## Created by: Qt User Interface Compiler version 6.9.0
 ##
 ## WARNING! All changes made in this file will be lost when recompiling UI file!
 ################################################################################
@@ -24,7 +24,7 @@ class Ui_MainWindow(object):
     def setupUi(self, MainWindow):
         if not MainWindow.objectName():
             MainWindow.setObjectName(u"MainWindow")
-        MainWindow.resize(823, 805)
+        MainWindow.resize(826, 805)
         self.centralwidget = QWidget(MainWindow)
         self.centralwidget.setObjectName(u"centralwidget")
         self.horizontalLayout = QHBoxLayout(self.centralwidget)
@@ -49,7 +49,7 @@ class Ui_MainWindow(object):
         self.verticalLayout_2.setContentsMargins(-1, 20, -1, -1)
         self.label = QLabel(self.tab_12)
         self.label.setObjectName(u"label")
-        sizePolicy = QSizePolicy(QSizePolicy.Minimum, QSizePolicy.Preferred)
+        sizePolicy = QSizePolicy(QSizePolicy.Policy.Minimum, QSizePolicy.Policy.Preferred)
         sizePolicy.setHorizontalStretch(0)
         sizePolicy.setVerticalStretch(0)
         sizePolicy.setHeightForWidth(self.label.sizePolicy().hasHeightForWidth())
@@ -92,7 +92,7 @@ class Ui_MainWindow(object):
 
         self.verticalLayout.addWidget(self.comboBox_12_pin, 0, Qt.AlignHCenter)
 
-        self.horizontalSpacer = QSpacerItem(40, 20, QSizePolicy.Expanding, QSizePolicy.Minimum)
+        self.horizontalSpacer = QSpacerItem(40, 20, QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Minimum)
 
         self.verticalLayout.addItem(self.horizontalSpacer)
 
@@ -108,7 +108,7 @@ class Ui_MainWindow(object):
         self.comboBox_12_oe = QComboBox(self.tab_12)
         self.comboBox_12_oe.setObjectName(u"comboBox_12_oe")
         self.comboBox_12_oe.setEnabled(False)
-        sizePolicy1 = QSizePolicy(QSizePolicy.Fixed, QSizePolicy.Fixed)
+        sizePolicy1 = QSizePolicy(QSizePolicy.Policy.Fixed, QSizePolicy.Policy.Fixed)
         sizePolicy1.setHorizontalStretch(0)
         sizePolicy1.setVerticalStretch(0)
         sizePolicy1.setHeightForWidth(self.comboBox_12_oe.sizePolicy().hasHeightForWidth())
@@ -137,7 +137,7 @@ class Ui_MainWindow(object):
         self.comboBox_12_func = QComboBox(self.tab_12)
         self.comboBox_12_func.setObjectName(u"comboBox_12_func")
         self.comboBox_12_func.setEnabled(False)
-        sizePolicy2 = QSizePolicy(QSizePolicy.Maximum, QSizePolicy.Fixed)
+        sizePolicy2 = QSizePolicy(QSizePolicy.Policy.Maximum, QSizePolicy.Policy.Fixed)
         sizePolicy2.setHorizontalStretch(0)
         sizePolicy2.setVerticalStretch(0)
         sizePolicy2.setHeightForWidth(self.comboBox_12_func.sizePolicy().hasHeightForWidth())
@@ -258,7 +258,7 @@ class Ui_MainWindow(object):
 
         self.submitButton_12 = QPushButton(self.tab_12)
         self.submitButton_12.setObjectName(u"submitButton_12")
-        sizePolicy3 = QSizePolicy(QSizePolicy.Minimum, QSizePolicy.Fixed)
+        sizePolicy3 = QSizePolicy(QSizePolicy.Policy.Minimum, QSizePolicy.Policy.Fixed)
         sizePolicy3.setHorizontalStretch(0)
         sizePolicy3.setVerticalStretch(0)
         sizePolicy3.setHeightForWidth(self.submitButton_12.sizePolicy().hasHeightForWidth())
@@ -322,7 +322,7 @@ class Ui_MainWindow(object):
 
         self.verticalLayout_6.addWidget(self.comboBox_5_pin, 0, Qt.AlignHCenter)
 
-        self.horizontalSpacer_3 = QSpacerItem(40, 20, QSizePolicy.Expanding, QSizePolicy.Minimum)
+        self.horizontalSpacer_3 = QSpacerItem(40, 20, QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Minimum)
 
         self.verticalLayout_6.addItem(self.horizontalSpacer_3)
 
@@ -441,7 +441,7 @@ class Ui_MainWindow(object):
         self.verticalLayout_10.setSpacing(10)
         self.verticalLayout_10.setObjectName(u"verticalLayout_10")
         self.verticalLayout_10.setContentsMargins(-1, -1, -1, 100)
-        self.horizontalSpacer_5 = QSpacerItem(40, 20, QSizePolicy.Expanding, QSizePolicy.Minimum)
+        self.horizontalSpacer_5 = QSpacerItem(40, 20, QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Minimum)
 
         self.verticalLayout_10.addItem(self.horizontalSpacer_5)
 
@@ -561,7 +561,7 @@ class Ui_MainWindow(object):
         self.verticalLayout_12.setSpacing(10)
         self.verticalLayout_12.setObjectName(u"verticalLayout_12")
         self.verticalLayout_12.setContentsMargins(-1, -1, -1, 100)
-        self.horizontalSpacer_6 = QSpacerItem(40, 20, QSizePolicy.Expanding, QSizePolicy.Minimum)
+        self.horizontalSpacer_6 = QSpacerItem(40, 20, QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Minimum)
 
         self.verticalLayout_12.addItem(self.horizontalSpacer_6)
 
@@ -639,7 +639,7 @@ class Ui_MainWindow(object):
         self.verticalLayout_14.setSpacing(10)
         self.verticalLayout_14.setObjectName(u"verticalLayout_14")
         self.verticalLayout_14.setContentsMargins(-1, -1, -1, 100)
-        self.horizontalSpacer_8 = QSpacerItem(40, 20, QSizePolicy.Expanding, QSizePolicy.Minimum)
+        self.horizontalSpacer_8 = QSpacerItem(40, 20, QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Minimum)
 
         self.verticalLayout_14.addItem(self.horizontalSpacer_8)
 
@@ -677,7 +677,7 @@ class Ui_MainWindow(object):
 
         self.verticalLayout_14.addLayout(self.horizontalLayout_28)
 
-        self.horizontalSpacer_9 = QSpacerItem(40, 20, QSizePolicy.Expanding, QSizePolicy.Minimum)
+        self.horizontalSpacer_9 = QSpacerItem(40, 20, QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Minimum)
 
         self.verticalLayout_14.addItem(self.horizontalSpacer_9)
 
@@ -808,7 +808,28 @@ class Ui_MainWindow(object):
         self.verticalLayout_16.setSpacing(10)
         self.verticalLayout_16.setObjectName(u"verticalLayout_16")
         self.verticalLayout_16.setContentsMargins(-1, -1, -1, 100)
-        self.horizontalSpacer_10 = QSpacerItem(40, 20, QSizePolicy.Expanding, QSizePolicy.Minimum)
+        self.horizontalLayout_51 = QHBoxLayout()
+        self.horizontalLayout_51.setObjectName(u"horizontalLayout_51")
+        self.horizontalLayout_51.setContentsMargins(0, -1, 0, 0)
+        self.label_58 = QLabel(self.tab_6)
+        self.label_58.setObjectName(u"label_58")
+        self.label_58.setMinimumSize(QSize(400, 0))
+        self.label_58.setMaximumSize(QSize(100, 16777215))
+        self.label_58.setAlignment(Qt.AlignCenter)
+
+        self.horizontalLayout_51.addWidget(self.label_58)
+
+        self.comboBox_9_source = QComboBox(self.tab_6)
+        self.comboBox_9_source.setObjectName(u"comboBox_9_source")
+        self.comboBox_9_source.setEnabled(True)
+        self.comboBox_9_source.setMaximumSize(QSize(16777215, 16777215))
+
+        self.horizontalLayout_51.addWidget(self.comboBox_9_source)
+
+
+        self.verticalLayout_16.addLayout(self.horizontalLayout_51)
+
+        self.horizontalSpacer_10 = QSpacerItem(40, 20, QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Minimum)
 
         self.verticalLayout_16.addItem(self.horizontalSpacer_10)
 
@@ -846,7 +867,7 @@ class Ui_MainWindow(object):
 
         self.verticalLayout_16.addLayout(self.horizontalLayout_36)
 
-        self.horizontalSpacer_11 = QSpacerItem(40, 20, QSizePolicy.Expanding, QSizePolicy.Minimum)
+        self.horizontalSpacer_11 = QSpacerItem(40, 20, QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Minimum)
 
         self.verticalLayout_16.addItem(self.horizontalSpacer_11)
 
@@ -977,7 +998,7 @@ class Ui_MainWindow(object):
         self.verticalLayout_18.setSpacing(10)
         self.verticalLayout_18.setObjectName(u"verticalLayout_18")
         self.verticalLayout_18.setContentsMargins(-1, -1, -1, 100)
-        self.horizontalSpacer_12 = QSpacerItem(40, 20, QSizePolicy.Expanding, QSizePolicy.Minimum)
+        self.horizontalSpacer_12 = QSpacerItem(40, 20, QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Minimum)
 
         self.verticalLayout_18.addItem(self.horizontalSpacer_12)
 
@@ -1015,7 +1036,7 @@ class Ui_MainWindow(object):
 
         self.verticalLayout_18.addLayout(self.horizontalLayout_39)
 
-        self.horizontalSpacer_13 = QSpacerItem(40, 20, QSizePolicy.Expanding, QSizePolicy.Minimum)
+        self.horizontalSpacer_13 = QSpacerItem(40, 20, QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Minimum)
 
         self.verticalLayout_18.addItem(self.horizontalSpacer_13)
 
@@ -1146,7 +1167,7 @@ class Ui_MainWindow(object):
         self.verticalLayout_21.setSpacing(10)
         self.verticalLayout_21.setObjectName(u"verticalLayout_21")
         self.verticalLayout_21.setContentsMargins(-1, -1, -1, 100)
-        self.horizontalSpacer_14 = QSpacerItem(40, 20, QSizePolicy.Expanding, QSizePolicy.Minimum)
+        self.horizontalSpacer_14 = QSpacerItem(40, 20, QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Minimum)
 
         self.verticalLayout_21.addItem(self.horizontalSpacer_14)
 
@@ -1184,7 +1205,7 @@ class Ui_MainWindow(object):
 
         self.verticalLayout_21.addLayout(self.horizontalLayout_42)
 
-        self.horizontalSpacer_15 = QSpacerItem(40, 20, QSizePolicy.Expanding, QSizePolicy.Minimum)
+        self.horizontalSpacer_15 = QSpacerItem(40, 20, QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Minimum)
 
         self.verticalLayout_21.addItem(self.horizontalSpacer_15)
 
@@ -1340,7 +1361,7 @@ class Ui_MainWindow(object):
 
         self.verticalLayout_24.addWidget(self.comboBox_13_pin, 0, Qt.AlignHCenter)
 
-        self.horizontalSpacer_7 = QSpacerItem(40, 20, QSizePolicy.Expanding, QSizePolicy.Minimum)
+        self.horizontalSpacer_7 = QSpacerItem(40, 20, QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Minimum)
 
         self.verticalLayout_24.addItem(self.horizontalSpacer_7)
 
@@ -1546,7 +1567,7 @@ class Ui_MainWindow(object):
 
         self.verticalLayout_8.addWidget(self.comboBox_14_pin, 0, Qt.AlignHCenter)
 
-        self.horizontalSpacer_4 = QSpacerItem(40, 20, QSizePolicy.Expanding, QSizePolicy.Minimum)
+        self.horizontalSpacer_4 = QSpacerItem(40, 20, QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Minimum)
 
         self.verticalLayout_8.addItem(self.horizontalSpacer_4)
 
@@ -1829,7 +1850,7 @@ class Ui_MainWindow(object):
         self.tabWidget.setTabText(self.tabWidget.indexOf(self.tab_4), QCoreApplication.translate("MainWindow", u"LSE / HSE", None))
         self.label_18.setText(QCoreApplication.translate("MainWindow", u"CPU_CLK (HCLK)", None))
         self.label_5.setText(QCoreApplication.translate("MainWindow", u"fHSE = 8 \u041c\u0413\u0446 (\u0435\u0441\u043b\u0438 \u044d\u0442\u043e \u043d\u0435 \u0442\u0430\u043a, \u0438\u0441\u043f\u0440\u0430\u0432\u044c\u0442\u0435 \u0437\u043d\u0430\u0447\u0435\u043d\u0438\u0435 \u043d\u0438\u0436\u0435)", None))
-        self.checkBox_8_nhse.setText(QCoreApplication.translate("MainWindow", u"\u0434\u0440\u0443\u0433\u0430\u044f \u0447\u0430\u0441\u0442\u043e\u0442\u0430 HSE", None))
+        self.checkBox_8_nhse.setText(QCoreApplication.translate("MainWindow", u"\u0434\u0440\u0443\u0433\u0430\u044f \u0447\u0430\u0441\u0442\u043e\u0442\u0430", None))
         self.lineEdit_8_nhse.setText("")
         self.label_6.setText(QCoreApplication.translate("MainWindow", u"\u0412\u044b\u0431\u0435\u0440\u0438\u0442\u0435 \u043e\u0434\u043d\u0443 \u0438\u0437 \u0444\u043e\u0440\u043c \u0438\u0441\u0445\u043e\u0434\u043d\u044b\u0445 \u0434\u0430\u043d\u043d\u044b\u0445 \u0438 \u0432\u0432\u0435\u0434\u0438\u0442\u0435 \u0438\u0445", None))
         self.checkBox_8_freq.setText(QCoreApplication.translate("MainWindow", u"\u0414\u0430\u043d\u0430 \u0447\u0430\u0441\u0442\u043e\u0442\u0430", None))
@@ -1839,8 +1860,9 @@ class Ui_MainWindow(object):
         self.submitButton_8.setText(QCoreApplication.translate("MainWindow", u"\u041f\u043e\u0435\u0445\u0430\u043b\u0438!", None))
         self.tabWidget.setTabText(self.tabWidget.indexOf(self.tab_5), QCoreApplication.translate("MainWindow", u"CPU_CLK", None))
         self.label_32.setText(QCoreApplication.translate("MainWindow", u"USB_CLK (HCLK)", None))
+        self.label_58.setText(QCoreApplication.translate("MainWindow", u"\u0418\u0441\u0442\u043e\u0447\u043d\u0438\u043a", None))
         self.label_33.setText(QCoreApplication.translate("MainWindow", u"fHSE = 8 \u041c\u0413\u0446 (\u0435\u0441\u043b\u0438 \u044d\u0442\u043e \u043d\u0435 \u0442\u0430\u043a, \u0438\u0441\u043f\u0440\u0430\u0432\u044c\u0442\u0435 \u0437\u043d\u0430\u0447\u0435\u043d\u0438\u0435 \u043d\u0438\u0436\u0435)", None))
-        self.checkBox_9_nhse.setText(QCoreApplication.translate("MainWindow", u"\u0434\u0440\u0443\u0433\u0430\u044f \u0447\u0430\u0441\u0442\u043e\u0442\u0430 HSE", None))
+        self.checkBox_9_nhse.setText(QCoreApplication.translate("MainWindow", u"\u0447\u0430\u0441\u0442\u043e\u0442\u0430 HSE", None))
         self.lineEdit_9_nhse.setText("")
         self.label_34.setText(QCoreApplication.translate("MainWindow", u"\u0412\u044b\u0431\u0435\u0440\u0438\u0442\u0435 \u043e\u0434\u043d\u0443 \u0438\u0437 \u0444\u043e\u0440\u043c \u0438\u0441\u0445\u043e\u0434\u043d\u044b\u0445 \u0434\u0430\u043d\u043d\u044b\u0445 \u0438 \u0432\u0432\u0435\u0434\u0438\u0442\u0435 \u0438\u0445", None))
         self.checkBox_9_freq.setText(QCoreApplication.translate("MainWindow", u"\u0414\u0430\u043d\u0430 \u0447\u0430\u0441\u0442\u043e\u0442\u0430", None))
