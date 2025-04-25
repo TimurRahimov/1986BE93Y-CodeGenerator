@@ -24,8 +24,8 @@ settings = {
         "ГГц": 10 ** 9
     },
     "source": {
+        Source.HSE.value,
         Source.HSI.value,
-        Source.HSE.value
     }
 }
 
@@ -45,7 +45,7 @@ class Q9(Q8):
             self.ui.comboBox_9_source.addItem(_)
         self.ui.lineEdit_9_nhse.setText("8")
         self.ui.comboBox_9_nhse.setCurrentText("МГц")
-        self.ui.comboBox_9_source.setCurrentText(Source.HSI.value)
+        self.ui.comboBox_9_source.setCurrentText(Source.HSE.value)
 
     def __9_connect_signals(self):
         self.ui.checkBox_9_nhse.stateChanged.connect(self.__9_unlock_options)
@@ -109,7 +109,6 @@ class Q9(Q8):
         self.show_code(with_func=func, with_reg=reg)
 
     def __9_create_func_code(self, source: Source, num: int, denum: int, freq: int) -> str:
-
         if denum == 2:
             div = 1
             n = 2
