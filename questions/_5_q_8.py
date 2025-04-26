@@ -23,12 +23,12 @@ settings = {
         "МГц": 10 ** 6,
         "ГГц": 10 ** 9
     },
-    "source": {
+    "source": [
         Source.HSE.value,
         Source.HSI.value,
         Source.LSE.value,
         Source.LSI.value,
-    }
+    ]
 }
 
 cpu_c3_sel = dict(zip(clk_div[1:], range(8, 16)))
@@ -51,7 +51,7 @@ class Q8(Q7):
         self.ui.lineEdit_8_nhse.setText("8")
         self.ui.lineEdit_8_num.setText("1")
         self.ui.comboBox_8_nhse.setCurrentText("МГц")
-        self.ui.comboBox_8_source.setCurrentText(Source.HSE.value)
+        self.ui.comboBox_8_source.setCurrentText(settings["source"][0])
 
     def __8_connect_signals(self):
         self.ui.checkBox_8_nhse.stateChanged.connect(self.__8_unlock_options)

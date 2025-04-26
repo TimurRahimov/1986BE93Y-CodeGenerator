@@ -24,12 +24,12 @@ settings = {
         "МГц": 10 ** 6,
         "ГГц": 10 ** 9
     },
-    "source": {
+    "source": [
         Source.HSE.value,
         Source.LSE.value,
         Source.LSI.value,
         Source.USB.value,
-    }
+    ]
 }
 
 
@@ -49,7 +49,7 @@ class Q10(Q9):
         self.ui.lineEdit_10_nhse.setText("48")
         self.ui.comboBox_10_nhse.setCurrentText("МГц")
         self.ui.lineEdit_10_num.setText("1")
-        self.ui.comboBox_10_source.setCurrentText(Source.LSE.value)
+        self.ui.comboBox_10_source.setCurrentText(settings["source"][0])
 
     def __10_connect_signals(self):
         self.ui.checkBox_10_nhse.stateChanged.connect(self.__10_unlock_options)

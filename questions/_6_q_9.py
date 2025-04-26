@@ -23,10 +23,10 @@ settings = {
         "МГц": 10 ** 6,
         "ГГц": 10 ** 9
     },
-    "source": {
+    "source": [
         Source.HSE.value,
         Source.HSI.value,
-    }
+    ]
 }
 
 
@@ -46,7 +46,7 @@ class Q9(Q8):
         self.ui.lineEdit_9_nhse.setText("8")
         self.ui.lineEdit_9_num.setText("1")
         self.ui.comboBox_9_nhse.setCurrentText("МГц")
-        self.ui.comboBox_9_source.setCurrentText(Source.HSE.value)
+        self.ui.comboBox_9_source.setCurrentText(settings["source"][0])
 
     def __9_connect_signals(self):
         self.ui.checkBox_9_nhse.stateChanged.connect(self.__9_unlock_options)
