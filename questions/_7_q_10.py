@@ -14,6 +14,7 @@ class Source(enum.Enum):
     LSI = "LSI"
     HSE = "HSE"
     LSE = "LSE"
+    USB = "USB"
 
 
 settings = {
@@ -27,6 +28,7 @@ settings = {
         Source.HSE.value,
         Source.LSE.value,
         Source.LSI.value,
+        Source.USB.value,
     }
 }
 
@@ -148,6 +150,12 @@ class Q10(Q9):
                          "    }\n"
                          "}\n"
                          )
+        elif source == Source.USB:
+            code += ("RST_CLK_ADCclkSelection(RST_CLK_ADCclkUSB_C1); // ADC_C2 = ADC_C1 = USB_C1\n"
+                     f"RST_CLK_ADCclkPrescaler(RST_CLK_ADCclkDIV{denum}); // N = {denum}\n"
+                     "RST_CLK_ADCclkEnable(ENABLE); // Разрешение тактироавания\n"
+                     )
+
         return code
 
     def __10_create_reg_code(self, source: Source, num: int | None, denum: int) -> str:
@@ -158,18 +166,21 @@ class Q10(Q9):
             Source.LSE: 0b00,
             Source.LSI: 0b01,
             Source.HSE: 0b10,
+            Source.USB: 0b10,
+        }
+
+        adc_c1_sel = {
+            Source.USB: 0b01,
+            Source.LSE: 0b10,
+            Source.LSI: 0b10,
+            Source.HSE: 0b10,
         }
 
         adc_mco_clk = 0
         adc_mco_clk |= (1 << 13)
         adc_mco_clk |= (adc_c3_sel[denum] << 8)
         adc_mco_clk |= adc_c2_sel[source] << 4
-        adc_mco_clk |= 1
-
-        code = (
-            f"// {hex(adc_mco_clk)} = {bin(adc_mco_clk)}, ADC_C1 = USB_C1, ADC_C2 = ADC_C1, ADC_C3 = ADC_C2/{denum}\n"
-            f"// Более подробно на [c. 173] Спецификации\n\n"
-            f"MDR_RST_CLK->ADC_MCO_CLOCK = {hex(adc_mco_clk)}; // ADCCLKEN = 1\n")
+        adc_mco_clk |= adc_c1_sel[source]
 
         code = ""
 
@@ -208,10 +219,16 @@ class Q10(Q9):
                          f"    MDR_RST_CLK->PLL_CONTROL |= 1 | ({num - 1} << 4); // PLLUSBON = 1, PLLUSBMUL = {num - 1}\n"
                          "    if(MDR_RST_CLK->CLOCK_STATUS & 1)\n"
                          "    { // Схема умножения частоты USB_PLL запустилась и работает стабильно\n"
-                         f"        // {hex(adc_mco_clk)} = {bin(adc_mco_clk)}, ADC_C1 = USB_C1, ADC_C2 = ADC_C1, ADC_C3 = ADC_C2/{denum}\n"
+                         f"        // {hex(adc_mco_clk)} = {bin(adc_mco_clk)}, ADC_C1 = USB_C2, ADC_C2 = ADC_C1, ADC_C3 = ADC_C2/{denum}\n"
                          f"        // Более подробно на [c. 173] Спецификации\n\n"
                          f"        MDR_RST_CLK->ADC_MCO_CLOCK = {hex(adc_mco_clk)}; // ADCCLKEN = 1\n"
                          "    }\n"
                          "}\n")
+        elif source == Source.USB:
+            code += (
+                f"// {hex(adc_mco_clk)} = {bin(adc_mco_clk)}, ADC_C1 = USB_C1, ADC_C2 = ADC_C1, ADC_C3 = ADC_C2/{denum}\n"
+                f"// Более подробно на [c. 173] Спецификации\n\n"
+                f"MDR_RST_CLK->ADC_MCO_CLOCK = {hex(adc_mco_clk)}; // ADCCLKEN = 1\n"
+                )
 
         return code
