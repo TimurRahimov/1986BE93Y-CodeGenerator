@@ -6,7 +6,7 @@ from questions import Q9
 
 eeprom_latency = [x * 10 ** 6 for x in [25, 50, 75, 100, 125, 150, 175, 200]]
 pll_mul = [1]
-clk_div = [2 ** x for x in range(9)]
+clk_div = [2 ** x for x in range(10)]
 
 
 class Source(enum.Enum):
@@ -129,13 +129,18 @@ class Q10(Q9):
                      "}\n")
         elif source == Source.HSE:
             if num:
+                div = 1
+                if denum > 1:
+                    div = 2
+                    denum >>= 1
+
                 code += (f"RST_CLK_HSEconfig(RST_CLK_HSE_ON); // Запуск HSE, fHSE={int(hse_freq / (10 ** 6))} МГц\n"
                          "if (RST_CLK_HSEstatus() == ERROR)\n"
                          "    RST_CLK_HSEconfig(RST_CLK_HSE_OFF); // HSE не запустился – выключение HSE\n"
                          "else // HSE запустился и работает стабильно\n"
                          "{\n"
                          f"    // Первый мультиплексор, USB_C1 = HSE, PLLUSBMUL = {num - 1}\n"
-                         f"    RST_CLK_USB_PLLconfig(RST_CLK_USB_PLLsrcHSEdiv1, RST_CLK_USB_PLLmul{num});\n"
+                         f"    RST_CLK_USB_PLLconfig(RST_CLK_USB_PLLsrcHSEdiv{div}, RST_CLK_USB_PLLmul{num});\n"
                          "    RST_CLK_USB_PLLcmd(ENABLE); // Включение схемы умножения частоты\n"
                          "    // Ожидание запуска и стабильной работы схемы умножения частоты\n"
                          "    if(RST_CLK_USB_PLLstatus() == ERROR)\n"
@@ -159,7 +164,7 @@ class Q10(Q9):
         return code
 
     def __10_create_reg_code(self, source: Source, num: int | None, denum: int) -> str:
-        adc_c3_sel = dict(zip(clk_div[1:], range(8, 16)))
+        adc_c3_sel = dict(zip(clk_div[1:], range(8, 17)))
         adc_c3_sel[1] = 0
 
         adc_c2_sel = {
@@ -174,6 +179,13 @@ class Q10(Q9):
             Source.LSE: 0b10,
             Source.LSI: 0b10,
             Source.HSE: 0b10,
+        }
+
+        usb_c1_sel = {
+            source.HSI: 0b00,
+            source.HSE: 0b10,
+            source.LSE: 0b00,
+            source.LSI: 0b00,
         }
 
         adc_mco_clk = 0
@@ -207,6 +219,22 @@ class Q10(Q9):
 
         elif source == Source.HSE:
             if num:
+                div = 0
+                if denum > 1:
+                    div = 1
+                    denum >>= 1
+
+                adc_mco_clk = 0
+                adc_mco_clk |= (1 << 13)
+                adc_mco_clk |= (adc_c3_sel[denum] << 8)
+                adc_mco_clk |= adc_c2_sel[source] << 4
+                adc_mco_clk |= adc_c1_sel[source]
+
+                usb_clock = 0
+                usb_clock |= usb_c1_sel[source] + div
+                usb_clock |= (1 << 2)
+                usb_clock |= (1 << 8)
+
                 adc_mco_clk |= 3
                 code += ("MDR_RST_CLK->HS_CONTROL |= 1; // Вкл. HSE\n"
                          "if(!(MDR_RST_CLK->CLOCK_STATUS & 4))\n"
@@ -215,6 +243,7 @@ class Q10(Q9):
                          "}\n"
                          "else // // HSE запустился и работает стабильно\n"
                          "{\n"
+                         f"    MDR_RST_CLK->USB_CLOCK = {hex(usb_clock)}; // {bin(usb_clock)}\n"
                          "    // Запуск схемы умножения частоты USB_PLL\n"
                          "    MDR_RST_CLK->PLL_CONTROL &= ~0xF0; // Сброс PLLUSBMUL\n"
                          f"    MDR_RST_CLK->PLL_CONTROL |= 1 | ({num - 1} << 4); // PLLUSBON = 1, PLLUSBMUL = {num - 1}\n"
