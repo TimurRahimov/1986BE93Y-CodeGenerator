@@ -44,6 +44,7 @@ class Q9(Q8):
         for _ in settings["source"]:
             self.ui.comboBox_9_source.addItem(_)
         self.ui.lineEdit_9_nhse.setText("8")
+        self.ui.lineEdit_9_num.setText("1")
         self.ui.comboBox_9_nhse.setCurrentText("МГц")
         self.ui.comboBox_9_source.setCurrentText(Source.HSE.value)
 

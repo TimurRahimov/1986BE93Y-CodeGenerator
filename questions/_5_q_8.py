@@ -6,7 +6,7 @@ from questions import Q7
 
 eeprom_latency = [x * 10 ** 6 for x in [25, 50, 75, 100, 125, 150, 175, 200]]
 pll_mul = list(range(17))
-clk_div = [2 ** x for x in range(9)]
+clk_div = [2 ** x for x in range(10)]
 
 
 class Source(enum.Enum):
@@ -49,6 +49,7 @@ class Q8(Q7):
         for _ in settings["source"]:
             self.ui.comboBox_8_source.addItem(_)
         self.ui.lineEdit_8_nhse.setText("8")
+        self.ui.lineEdit_8_num.setText("1")
         self.ui.comboBox_8_nhse.setCurrentText("МГц")
         self.ui.comboBox_8_source.setCurrentText(Source.HSE.value)
 
@@ -96,10 +97,10 @@ class Q8(Q7):
                 if num not in pll_mul or denum not in clk_div:
                     return
             elif b_freq:
-                freq = int(self.ui.lineEdit_8_freq.text()) * settings[
+                need_freq = int(self.ui.lineEdit_8_freq.text()) * settings[
                     "freq_unit"][self.ui.comboBox_8_freq_unit.currentText()]
                 for div in clk_div:
-                    a = (freq * div / freq)
+                    a = (need_freq * div / freq)
                     if int(a) == a:
                         if a > 16:
                             continue
@@ -128,6 +129,11 @@ class Q8(Q7):
 
         code = ""
 
+        div = 1
+        if denum > 1:
+            div = 2
+            denum >>= 1
+
         if source == Source.HSE:
             code += (f"RST_CLK_HSEconfig(RST_CLK_HSE_ON); // Запуск HSE\n"
                      "if (RST_CLK_HSEstatus() == ERROR)\n"
@@ -146,8 +152,8 @@ class Q8(Q7):
 
         if source == Source.HSE or source == Source.HSI:
             code += ("{\n"
-                     f"    // Первый мультиплексор, CPU_C1 = {source.value}, PLLCPUMUL = {num - 1}\n"
-                     f"    RST_CLK_CPU_PLLconfig(RST_CLK_CPU_PLLsrc{source.value}div1, RST_CLK_CPU_PLLmul{num});\n"
+                     f"    // Первый мультиплексор, CPU_C1 = {source.value}/{div}, PLLCPUMUL = {num - 1}\n"
+                     f"    RST_CLK_CPU_PLLconfig(RST_CLK_CPU_PLLsrc{source.value}div{div}, RST_CLK_CPU_PLLmul{num});\n"
                      "    RST_CLK_CPU_PLLcmd(ENABLE); // Включение схемы умножения частоты\n"
                      "    // Ожидание запуска и стабильной работы схемы умножения частоты\n"
                      "    if(RST_CLK_CPU_PLLstatus() == ERROR)\n"
@@ -169,11 +175,21 @@ class Q8(Q7):
         return code
 
     def __8_create_reg_code(self, source: Source, num: int, denum: int, hse_freq: int, latency_level: int) -> str:
+        div = 0
+        if denum > 1:
+            div = 1
+            denum /= 2
+
+        cpu_c1_sel = {
+            source.HSI: 0b00,
+            source.HSE: 0b10,
+        }
+
         cpu_clock = 0
         cpu_clock |= 1 << 8
         cpu_clock |= cpu_c3_sel[denum] << 4
         cpu_clock |= 1 << 2
-        cpu_clock |= 1 << 1
+        cpu_clock |= (cpu_c1_sel[source] + div)
 
         code = ""
 
@@ -213,7 +229,7 @@ class Q8(Q7):
                      "    if(MDR_RST_CLK->CLOCK_STATUS & 2)\n"
                      "    { // Схема умножения частоты CPU_PLL запустилась и работает стабильно\n"
                      f"        MDR_EEPROM->CMD |= {latency_level} << 3;\n"
-                     f"        MDR_RST_CLK->CPU_CLOCK = {hex(cpu_clock)}; // выбор fHCLK=f{source.value} : {bin(cpu_clock)}\n"
+                     f"        MDR_RST_CLK->CPU_CLOCK = {hex(cpu_clock)}; // выбор fHCLK=CPU_C3 : {bin(cpu_clock)}\n"
                      "    }\n"
                      "    else\n"
                      "        // Схема умножения частоты CPU_PLL не запустилась или работает нестабильно\n"
