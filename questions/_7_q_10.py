@@ -201,6 +201,7 @@ class Q10(Q9):
                          "else // // LSI запустился и работает стабильно\n")
             code += ("{\n"
                      f"    // Более подробно на [c. 173] Спецификации\n\n"
+                     f"    // {hex(adc_mco_clk)} = {bin(adc_mco_clk)}\n"
                      f"    MDR_RST_CLK->ADC_MCO_CLOCK = {hex(adc_mco_clk)}; // ADCCLKEN = 1\n"
                      "}\n")
 
@@ -228,7 +229,7 @@ class Q10(Q9):
             code += (
                 f"// {hex(adc_mco_clk)} = {bin(adc_mco_clk)}, ADC_C1 = USB_C1, ADC_C2 = ADC_C1, ADC_C3 = ADC_C2/{denum}\n"
                 f"// Более подробно на [c. 173] Спецификации\n\n"
-                f"MDR_RST_CLK->ADC_MCO_CLOCK = {hex(adc_mco_clk)}; // ADCCLKEN = 1\n"
-                )
+                f"MDR_RST_CLK->ADC_MCO_CLOCK = {hex(adc_mco_clk)}; // ADCCLKEN = 1 \n"
+            )
 
         return code

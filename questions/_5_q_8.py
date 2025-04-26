@@ -183,6 +183,8 @@ class Q8(Q7):
         cpu_c1_sel = {
             source.HSI: 0b00,
             source.HSE: 0b10,
+            source.LSE: 0b00,
+            source.LSI: 0b00,
         }
 
         cpu_clock = 0
