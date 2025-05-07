@@ -1,8 +1,49 @@
 import dataclasses
+import enum
 
 from PySide6.QtWidgets import QCheckBox
 
 from questions import Q11
+
+
+class IRQHandler(enum.Enum):
+    INVERSE_OUT = "Инверсия выхода"             # Реализовано
+    START_ADC = "Запуск АЦП"                    #
+    STOP_ADC = "Остановка АЦП"                  #
+    READ_ADC = "Чтение результата АЦП"          #
+    WRITE_DAC = "Запись значения в ЦАП"         #
+    START_SYS_TICK = "Запуск SysTick"           #
+    STOP_SYS_TICK = "Остановка SysTick"         #
+    START_GENERATOR = "Запуск генератора"       # Реализовано
+    STOP_GENERATOR = "Остановка генератора"     # Реализовано
+
+
+class Source(enum.Enum):
+    HSI = "HSI"
+    LSI = "LSI"
+    HSE = "HSE"
+    LSE = "LSE"
+
+
+settings = {
+    "IRQHandlers": [
+        IRQHandler.INVERSE_OUT.value,
+        IRQHandler.START_ADC.value,
+        IRQHandler.STOP_ADC.value,
+        IRQHandler.READ_ADC.value,
+        IRQHandler.WRITE_DAC.value,
+        IRQHandler.START_SYS_TICK.value,
+        IRQHandler.STOP_SYS_TICK.value,
+        IRQHandler.START_GENERATOR.value,
+        IRQHandler.STOP_GENERATOR.value,
+    ],
+    "Sources": [
+        Source.HSE.value,
+        Source.HSI.value,
+        Source.LSE.value,
+        Source.LSI.value,
+    ]
+}
 
 
 @dataclasses.dataclass
@@ -15,7 +56,8 @@ class TimerSettings:
     m: int
     arr: int
     psg: int
-    irq: str
+    irq: IRQHandler
+    irq_param: str
 
 
 class Q13(Q11):
@@ -35,10 +77,11 @@ class Q13(Q11):
             self.ui.comboBox_13_time_unit.addItem(_)
         for _ in self.unit_settings["freq_unit"]:
             self.ui.comboBox_13_freq_unit.addItem(_)
-        for _ in ('Инверсия выхода',):
+        for _ in settings["IRQHandlers"]:
             self.ui.comboBox_13_irq.addItem(_)
 
     def __13_connect_signals(self):
+        self.ui.comboBox_13_irq.currentIndexChanged.connect(self.__13_irq_handler)
         self.ui.submitButton_13.clicked.connect(self.__13_submit_handler)
 
     def __13_unlock_options(self):
@@ -66,6 +109,17 @@ class Q13(Q11):
         self.ui.comboBox_13_timer.setCurrentIndex(0)
         self.ui.comboBox_13_channel.setCurrentIndex(0)
 
+    def __13_irq_handler(self):
+        irq = IRQHandler(self.ui.comboBox_13_irq.currentText())
+
+        self.ui.comboBox_13_irq_param.setEnabled(False)
+        self.ui.comboBox_13_irq_param.clear()
+
+        if irq in (IRQHandler.START_GENERATOR, IRQHandler.STOP_GENERATOR):
+            for _ in settings["Sources"]:
+                self.ui.comboBox_13_irq_param.addItem(_)
+            self.ui.comboBox_13_irq_param.setEnabled(True)
+
     def __13_submit_handler(self):
         port = self.ui.comboBox_13_port.currentText()
         pin = self.ui.comboBox_13_pin.currentText()
@@ -81,13 +135,14 @@ class Q13(Q11):
         arr = int(self.ui.lineEdit_13_arr.text())
         psg = int(self.ui.lineEdit_13_psg.text())
 
-        irq = self.ui.comboBox_13_irq.currentText()
+        irq = IRQHandler(self.ui.comboBox_13_irq.currentText())
+        irq_param = self.ui.comboBox_13_irq_param.currentText()
 
-        pwm_set = TimerSettings(port=port, pin=pin, tmr=tmr, time=time, mk_freq=mk_freq,
-                                m=m, arr=arr, psg=psg, irq=irq)
+        tmr_set = TimerSettings(port=port, pin=pin, tmr=tmr, time=time, mk_freq=mk_freq,
+                                m=m, arr=arr, psg=psg, irq=irq, irq_param=irq_param)
 
-        func = self.__13_create_func_code(pwm_set)
-        reg = self.__13_create_reg_code(pwm_set)
+        func = self.__13_create_func_code(tmr_set)
+        reg = self.__13_create_reg_code(tmr_set)
 
         self.show_code(with_func=func, with_reg=reg)
 
@@ -116,20 +171,36 @@ class Q13(Q11):
                  "    while(1) { }\n"
                  "}\n\n")
 
-        if tmr_set.irq == 'Инверсия выхода':
-            code += (f"void Timer{tmr_set.tmr}_IRQHandler(void) "
-                     "{\n"
-                     f"    if (TIMER_GetFlagStatus(MDR_TIMER{tmr_set.tmr}, TIMER_STATUS_CNT_ARR) == SET)"
-                     " // Если таймер досчитал до основания \n"
-                     "    {\n"
-                     "        // Инверсия выхода \n"
+        code += (f"void Timer{tmr_set.tmr}_IRQHandler(void) "
+                 "{\n"
+                 f"    if (TIMER_GetFlagStatus(MDR_TIMER{tmr_set.tmr}, TIMER_STATUS_CNT_ARR) == SET)"
+                 " // Если таймер досчитал до основания \n"
+                 "    {\n")
+
+        if tmr_set.irq == IRQHandler.INVERSE_OUT:
+            code += ("        // Инверсия выхода \n"
                      "        if (++Counter & 1)\n"
                      f"            PORT_SetBits(MDR_PORT{tmr_set.port}, PORT_Pin_{tmr_set.pin}); // Установка бита \n"
                      f"        else\n"
-                     f"            PORT_ResetBits(MDR_PORT{tmr_set.port}, PORT_Pin_{tmr_set.pin}); // Сброс бита \n"
-                     f"        TIMER_ClearFlag(MDR_TIMER{tmr_set.tmr}, TIMER_STATUS_CNT_ARR); // Сброс флага\n"
-                     "    }\n"
-                     "}\n\n")
+                     f"            PORT_ResetBits(MDR_PORT{tmr_set.port}, PORT_Pin_{tmr_set.pin}); // Сброс бита \n")
+        elif tmr_set.irq == IRQHandler.START_GENERATOR:
+            if tmr_set.irq_param == Source.HSE.value:
+                code += f"        RST_CLK_HSEconfig(RST_CLK_HSE_ON); // Запуск HSE\n"
+            elif tmr_set.irq_param == Source.HSI.value:
+                code += f"        RST_CLK_HSIcmd(ENABLE); // Запуск HSI\n"
+            elif tmr_set.irq_param == Source.LSE.value or tmr_set.irq_param == Source.LSI.value:
+                code += f"        RST_CLK_{tmr_set.irq_param}config(RST_CLK_{tmr_set.irq_param}_ON); // Запуск {tmr_set.irq_param}\n"
+        elif tmr_set.irq == IRQHandler.STOP_GENERATOR:
+            if tmr_set.irq_param == Source.HSE.value:
+                code += "        RST_CLK_HSEconfig(RST_CLK_HSE_OFF); // Выключение HSE\n"
+            elif tmr_set.irq_param == Source.HSI.value:
+                code += f"        RST_CLK_HSIcmd(DISABLE); // Выключение HSI\n"
+            elif tmr_set.irq_param == Source.LSE.value or tmr_set.irq_param == Source.LSI.value:
+                code += f"        RST_CLK_{tmr_set.irq_param}config(RST_CLK_{tmr_set.irq_param}_OFF); // Выключение {tmr_set.irq_param}\n"
+
+        code += (f"        TIMER_ClearFlag(MDR_TIMER{tmr_set.tmr}, TIMER_STATUS_CNT_ARR); // Сброс флага\n"
+                 "    }\n"
+                 "}\n\n")
 
         code += ("void Port_setup(){\n"
                  "    // Данная функция не обязательна, но сюда можно вставить инициализацию "
@@ -164,15 +235,36 @@ class Q13(Q11):
                  "    while(1) { }\n"
                  "}\n\n")
 
-        if tmr_set.irq == 'Инверсия выхода':
-            code += (f"void Timer{tmr_set.tmr}_IRQHandler(void) "
-                     "{\n"
-                     f"    if (MDR_TIMER{tmr_set.tmr}->STATUS & (1 << 1)) // [c. 309] Если таймер досчитал до основания"
-                     "\n    {\n"
-                     f"        MDR_PORT{tmr_set.port}->RXTX ^= (1 << {tmr_set.pin}); // [с. 194] Инверсия вывода \n"
-                     f"        MDR_TIMER{tmr_set.tmr}->STATUS &= ~(1 << 1); // [c. 309] Сброс флага\n"
-                     "    }\n"
-                     "}\n\n")
+        code += (f"void Timer{tmr_set.tmr}_IRQHandler(void) "
+                 "{\n"
+                 f"    if (MDR_TIMER{tmr_set.tmr}->STATUS & (1 << 1)) // [c. 309] Если таймер досчитал до основания\n"
+                 "    {\n"
+                 )
+
+        if tmr_set.irq == IRQHandler.INVERSE_OUT:
+            code += f"        MDR_PORT{tmr_set.port}->RXTX ^= (1 << {tmr_set.pin}); // [с. 194] Инверсия вывода \n"
+        elif tmr_set.irq == IRQHandler.START_GENERATOR:
+            if tmr_set.irq_param == Source.HSE.value:
+                code += f"        MDR_RST_CLK->HS_CONTROL |= 1; // Вкл. HSE\n"
+            elif tmr_set.irq_param == Source.HSI.value:
+                code += f"        MDR_BKP->REG_0F |= (1 << 22); // Вкл. HSI\n"
+            elif tmr_set.irq_param == Source.LSE.value:
+                code += f"        MDR_BKP->REG_0F |= 1; // Вкл. LSE\n"
+            elif tmr_set.irq_param == Source.LSI.value:
+                code += f"        MDR_BKP->REG_0F |= (1 << 15); // Вкл. LSI\n"
+        elif tmr_set.irq == IRQHandler.STOP_GENERATOR:
+            if tmr_set.irq_param == Source.HSE.value:
+                code += "        MDR_RST_CLK->HS_CONTROL &=~1; // Выкл. HSE\n"
+            elif tmr_set.irq_param == Source.HSI.value:
+                code += f"        MDR_BKP->REG_0F &=~ (0 << 22); // Выкл. HSI\n"
+            elif tmr_set.irq_param == Source.LSE.value:
+                code += f"        MDR_BKP->REG_0F &=~ 1; // Выкл. LSE\n"
+            elif tmr_set.irq_param == Source.LSI.value:
+                code += f"        MDR_BKP->REG_0F &=~ (1 << 15); // Выкл. LSI\n"
+
+        code += (f"        MDR_TIMER{tmr_set.tmr}->STATUS &= ~(1 << 1); // [c. 309] Сброс флага\n"
+                 "    }\n"
+                 "}\n\n")
 
         code += ("void Port_setup(){\n"
                  "    // Данная функция не обязательна, но сюда можно вставить инициализацию "
