@@ -17,7 +17,7 @@ class IRQHandler(enum.Enum):
     STOP_DAC = "Остановка ЦАП"                  # Реализовано
     WRITE_DAC = "Запись значения в ЦАП"         # Реализовано
 
-    START_SYS_TICK = "Запуск SysTick"           #
+    START_SYS_TICK = "Запуск SysTick"           # Реализовано
 
     START_GENERATOR = "Запуск генератора"       # Реализовано
     STOP_GENERATOR = "Остановка генератора"     # Реализовано
@@ -161,6 +161,10 @@ class Q13(Q11):
             self.ui.comboBox_13_irq_param.setEnabled(True)
             if irq == IRQHandler.WRITE_DAC:
                 self.ui.lineEdit_13_irq_param.setEnabled(True)
+                self.ui.lineEdit_13_irq_param.setText("10")
+        elif irq == IRQHandler.START_SYS_TICK:
+            self.ui.lineEdit_13_irq_param.setEnabled(True)
+            self.ui.lineEdit_13_irq_param.setText("50000")
 
     def __13_submit_handler(self):
         port = self.ui.comboBox_13_port.currentText()
@@ -253,6 +257,8 @@ class Q13(Q11):
             code += f"        {tmr_set.irq_param}_Cmd(DISABLE); // Выключение {tmr_set.irq_param}\n"
         elif tmr_set.irq == IRQHandler.WRITE_DAC:
             code += f"        {tmr_set.irq_param}_SetData({tmr_set.irq_param_value});\n"
+        elif tmr_set.irq == IRQHandler.START_SYS_TICK:
+            code += f"        SysTick_Config({tmr_set.irq_param_value});\n"
 
         code += (f"        TIMER_ClearFlag(MDR_TIMER{tmr_set.tmr}, TIMER_STATUS_CNT_ARR); // Сброс флага\n"
                  "    }\n"
@@ -332,6 +338,10 @@ class Q13(Q11):
             code += f"        MDR_DAC->CFG &=~ (1 << {bit}); // Выключение {tmr_set.irq_param}\n"
         elif tmr_set.irq == IRQHandler.WRITE_DAC:
             code += f"        MDR_DAC->{tmr_set.irq_param}_DATA |= {tmr_set.irq_param_value} & 0xFFF\n"
+        elif tmr_set.irq == IRQHandler.START_SYS_TICK:
+            code += f"        SysTick->LOAD = {tmr_set.irq_param_value};\n"
+            code += f"        SysTick->VAL = 0;\n"
+            code += f"        SysTick->CTRL = 7; // Запуск SysTick\n"
 
         code += (f"        MDR_TIMER{tmr_set.tmr}->STATUS &= ~(1 << 1); // [c. 309] Сброс флага\n"
                  "    }\n"
