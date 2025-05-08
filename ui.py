@@ -1492,6 +1492,16 @@ class Ui_MainWindow(object):
 
         self.horizontalLayout_49.addWidget(self.comboBox_13_irq_param)
 
+        self.lineEdit_13_irq_param = QLineEdit(self.tab_9)
+        self.lineEdit_13_irq_param.setObjectName(u"lineEdit_13_irq_param")
+        self.lineEdit_13_irq_param.setEnabled(False)
+        self.lineEdit_13_irq_param.setMinimumSize(QSize(0, 0))
+        self.lineEdit_13_irq_param.setMaximumSize(QSize(150, 16777215))
+        self.lineEdit_13_irq_param.setAlignment(Qt.AlignCenter)
+        self.lineEdit_13_irq_param.setClearButtonEnabled(True)
+
+        self.horizontalLayout_49.addWidget(self.lineEdit_13_irq_param)
+
 
         self.verticalLayout_24.addLayout(self.horizontalLayout_49)
 
@@ -1950,6 +1960,7 @@ class Ui_MainWindow(object):
         self.label_51.setText(QCoreApplication.translate("MainWindow", u"\u0412\u0440\u0435\u043c\u044f \u0441\u0440\u0430\u0431\u0430\u0442\u044b\u0432\u0430\u043d\u0438\u044f \u0442\u0430\u0439\u043c\u0435\u0440\u0430 \u0422", None))
         self.label_52.setText(QCoreApplication.translate("MainWindow", u"\u0422\u0430\u043a\u0442\u043e\u0432\u0430\u044f \u0447\u0430\u0441\u0442\u043e\u0442\u0430 \u041c\u041a", None))
         self.label_53.setText(QCoreApplication.translate("MainWindow", u"\u0424\u0443\u043d\u043a\u0446\u0438\u044f \u043e\u0431\u0440\u0430\u0431\u043e\u0442\u043a\u0438 \u043f\u0440\u0435\u0440\u044b\u0432\u0430\u043d\u0438\u0439", None))
+        self.lineEdit_13_irq_param.setText("")
         self.label_54.setText(QCoreApplication.translate("MainWindow", u"\u0417\u043d\u0430\u0447\u0435\u043d\u0438\u044f M, PSG, ARR \u043d\u0435\u043e\u0431\u0445\u043e\u0434\u0438\u043c\u043e \u043d\u0430\u0439\u0442\u0438 \u0441 \u043f\u043e\u043c\u043e\u0449\u044c\u044e \u0441\u043f\u0435\u0446\u0438\u0430\u043b\u044c\u043d\u043e\u0433\u043e \u043a\u0430\u043b\u044c\u043a\u0443\u043b\u044f\u0442\u043e\u0440\u0430", None))
         self.pushButton_13_define_arr.setText("")
         self.label_55.setText(QCoreApplication.translate("MainWindow", u"M", None))

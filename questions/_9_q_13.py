@@ -8,9 +8,9 @@ from questions import Q11
 
 class IRQHandler(enum.Enum):
     INVERSE_OUT = "Инверсия выхода"             # Реализовано
-    START_ADC = "Запуск АЦП"                    #
-    STOP_ADC = "Остановка АЦП"                  #
-    READ_ADC = "Чтение результата АЦП"          #
+    START_ADC = "Запуск АЦП"                    # Реализовано
+    STOP_ADC = "Остановка АЦП"                  # Реализовано
+    READ_ADC = "Чтение результата АЦП"          # Реализовано
     WRITE_DAC = "Запись значения в ЦАП"         #
     START_SYS_TICK = "Запуск SysTick"           #
     STOP_SYS_TICK = "Остановка SysTick"         #
@@ -23,6 +23,11 @@ class Source(enum.Enum):
     LSI = "LSI"
     HSE = "HSE"
     LSE = "LSE"
+
+
+class ADC(enum.Enum):
+    n1 = "ADC1"
+    n2 = "ADC2"
 
 
 settings = {
@@ -42,6 +47,10 @@ settings = {
         Source.HSI.value,
         Source.LSE.value,
         Source.LSI.value,
+    ],
+    "ADC": [
+        ADC.n1.value,
+        ADC.n2.value,
     ]
 }
 
@@ -114,11 +123,24 @@ class Q13(Q11):
 
         self.ui.comboBox_13_irq_param.setEnabled(False)
         self.ui.comboBox_13_irq_param.clear()
+        self.ui.lineEdit_13_irq_param.setEnabled(False)
+        self.ui.lineEdit_13_irq_param.clear()
+        self.ui.comboBox_13_port.setEnabled(False)
+        self.ui.comboBox_13_pin.setEnabled(False)
 
-        if irq in (IRQHandler.START_GENERATOR, IRQHandler.STOP_GENERATOR):
+        if irq == IRQHandler.INVERSE_OUT:
+            self.ui.comboBox_13_port.setEnabled(True)
+            self.ui.comboBox_13_pin.setEnabled(True)
+        elif irq in (IRQHandler.START_GENERATOR, IRQHandler.STOP_GENERATOR):
             for _ in settings["Sources"]:
                 self.ui.comboBox_13_irq_param.addItem(_)
             self.ui.comboBox_13_irq_param.setEnabled(True)
+        elif irq in (IRQHandler.START_ADC, IRQHandler.READ_ADC, IRQHandler.STOP_ADC):
+            for _ in settings["ADC"]:
+                self.ui.comboBox_13_irq_param.addItem(_)
+            self.ui.comboBox_13_irq_param.setEnabled(True)
+        elif irq == IRQHandler.WRITE_DAC:
+            self.ui.lineEdit_13_irq_param.setEnabled(True)
 
     def __13_submit_handler(self):
         port = self.ui.comboBox_13_port.currentText()
@@ -197,16 +219,23 @@ class Q13(Q11):
                 code += f"        RST_CLK_HSIcmd(DISABLE); // Выключение HSI\n"
             elif tmr_set.irq_param == Source.LSE.value or tmr_set.irq_param == Source.LSI.value:
                 code += f"        RST_CLK_{tmr_set.irq_param}config(RST_CLK_{tmr_set.irq_param}_OFF); // Выключение {tmr_set.irq_param}\n"
+        elif tmr_set.irq == IRQHandler.START_ADC:
+            code += f"        {tmr_set.irq_param}_Cmd(ENABLE); // Включение {tmr_set.irq_param}\n"
+        elif tmr_set.irq == IRQHandler.STOP_ADC:
+            code += f"        {tmr_set.irq_param}_Cmd(DISABLE); // Выключение {tmr_set.irq_param}\n"
+        elif tmr_set.irq == IRQHandler.READ_ADC:
+            code += f"        uint32_t Result;\n"
+            code += f"        Result = {tmr_set.irq_param}_GetResult() & 0xFFF; // Результат {tmr_set.irq_param}\n"
 
         code += (f"        TIMER_ClearFlag(MDR_TIMER{tmr_set.tmr}, TIMER_STATUS_CNT_ARR); // Сброс флага\n"
                  "    }\n"
                  "}\n\n")
 
-        code += ("void Port_setup(){\n"
-                 "    // Данная функция не обязательна, но сюда можно вставить инициализацию "
-                 f"необходимого порта (P{tmr_set.port}{tmr_set.pin}) для функции обработки прерываний.\n"
-                 "    // Сгенерировать код для этой функции можно в окне \"Настройка порта\"\n"
-                 "}\n\n")
+        # code += ("void Port_setup(){\n"
+        #          "    // Данная функция не обязательна, но сюда можно вставить инициализацию "
+        #          f"необходимого порта (P{tmr_set.port}{tmr_set.pin}) для функции обработки прерываний.\n"
+        #          "    // Сгенерировать код для этой функции можно в окне \"Настройка порта\"\n"
+        #          "}\n\n")
 
         return code
 
@@ -261,15 +290,22 @@ class Q13(Q11):
                 code += f"        MDR_BKP->REG_0F &=~ 1; // Выкл. LSE\n"
             elif tmr_set.irq_param == Source.LSI.value:
                 code += f"        MDR_BKP->REG_0F &=~ (1 << 15); // Выкл. LSI\n"
+        elif tmr_set.irq == IRQHandler.START_ADC:
+            code += f"        MDR_ADC->{tmr_set.irq_param}_CFG |= 1; // Включение {tmr_set.irq_param}\n"
+        elif tmr_set.irq == IRQHandler.STOP_ADC:
+            code += f"        MDR_ADC->{tmr_set.irq_param}_CFG &= ~1; // Выключение {tmr_set.irq_param}\n"
+        elif tmr_set.irq == IRQHandler.READ_ADC:
+            code += f"        uint32_t Result;\n"
+            code += f"        Result = MDR_ADC->{tmr_set.irq_param}_RESULT & 0xFFF; // Результат {tmr_set.irq_param}\n"
 
         code += (f"        MDR_TIMER{tmr_set.tmr}->STATUS &= ~(1 << 1); // [c. 309] Сброс флага\n"
                  "    }\n"
                  "}\n\n")
 
-        code += ("void Port_setup(){\n"
-                 "    // Данная функция не обязательна, но сюда можно вставить инициализацию "
-                 f"необходимого порта (P{tmr_set.port}{tmr_set.pin}) для функции обработки прерываний.\n"
-                 "    // Сгенерировать код для этой функции можно в окне \"Настройка порта\"\n"
-                 "}\n\n")
+        # code += ("void Port_setup(){\n"
+        #          "    // Данная функция не обязательна, но сюда можно вставить инициализацию "
+        #          f"необходимого порта (P{tmr_set.port}{tmr_set.pin}) для функции обработки прерываний.\n"
+        #          "    // Сгенерировать код для этой функции можно в окне \"Настройка порта\"\n"
+        #          "}\n\n")
 
         return code
