@@ -8,12 +8,17 @@ from questions import Q11
 
 class IRQHandler(enum.Enum):
     INVERSE_OUT = "Инверсия выхода"             # Реализовано
+
     START_ADC = "Запуск АЦП"                    # Реализовано
     STOP_ADC = "Остановка АЦП"                  # Реализовано
     READ_ADC = "Чтение результата АЦП"          # Реализовано
-    WRITE_DAC = "Запись значения в ЦАП"         #
+
+    START_DAC = "Запуск ЦАП"                    # Реализовано
+    STOP_DAC = "Остановка ЦАП"                  # Реализовано
+    WRITE_DAC = "Запись значения в ЦАП"         # Реализовано
+
     START_SYS_TICK = "Запуск SysTick"           #
-    STOP_SYS_TICK = "Остановка SysTick"         #
+
     START_GENERATOR = "Запуск генератора"       # Реализовано
     STOP_GENERATOR = "Остановка генератора"     # Реализовано
 
@@ -30,15 +35,21 @@ class ADC(enum.Enum):
     n2 = "ADC2"
 
 
+class DAC(enum.Enum):
+    n1 = "DAC1"
+    n2 = "DAC2"
+
+
 settings = {
     "IRQHandlers": [
         IRQHandler.INVERSE_OUT.value,
         IRQHandler.START_ADC.value,
         IRQHandler.STOP_ADC.value,
         IRQHandler.READ_ADC.value,
+        IRQHandler.START_DAC.value,
+        IRQHandler.STOP_DAC.value,
         IRQHandler.WRITE_DAC.value,
         IRQHandler.START_SYS_TICK.value,
-        IRQHandler.STOP_SYS_TICK.value,
         IRQHandler.START_GENERATOR.value,
         IRQHandler.STOP_GENERATOR.value,
     ],
@@ -51,6 +62,10 @@ settings = {
     "ADC": [
         ADC.n1.value,
         ADC.n2.value,
+    ],
+    "DAC": [
+        DAC.n2.value,
+        DAC.n1.value,
     ]
 }
 
@@ -67,6 +82,7 @@ class TimerSettings:
     psg: int
     irq: IRQHandler
     irq_param: str
+    irq_param_value: str
 
 
 class Q13(Q11):
@@ -139,8 +155,12 @@ class Q13(Q11):
             for _ in settings["ADC"]:
                 self.ui.comboBox_13_irq_param.addItem(_)
             self.ui.comboBox_13_irq_param.setEnabled(True)
-        elif irq == IRQHandler.WRITE_DAC:
-            self.ui.lineEdit_13_irq_param.setEnabled(True)
+        elif irq in (IRQHandler.START_DAC, IRQHandler.WRITE_DAC, IRQHandler.STOP_DAC):
+            for _ in settings["DAC"]:
+                self.ui.comboBox_13_irq_param.addItem(_)
+            self.ui.comboBox_13_irq_param.setEnabled(True)
+            if irq == IRQHandler.WRITE_DAC:
+                self.ui.lineEdit_13_irq_param.setEnabled(True)
 
     def __13_submit_handler(self):
         port = self.ui.comboBox_13_port.currentText()
@@ -159,9 +179,10 @@ class Q13(Q11):
 
         irq = IRQHandler(self.ui.comboBox_13_irq.currentText())
         irq_param = self.ui.comboBox_13_irq_param.currentText()
+        irq_param_value = self.ui.lineEdit_13_irq_param.text()
 
         tmr_set = TimerSettings(port=port, pin=pin, tmr=tmr, time=time, mk_freq=mk_freq,
-                                m=m, arr=arr, psg=psg, irq=irq, irq_param=irq_param)
+                                m=m, arr=arr, psg=psg, irq=irq, irq_param=irq_param, irq_param_value=irq_param_value)
 
         func = self.__13_create_func_code(tmr_set)
         reg = self.__13_create_reg_code(tmr_set)
@@ -226,6 +247,12 @@ class Q13(Q11):
         elif tmr_set.irq == IRQHandler.READ_ADC:
             code += f"        uint32_t Result;\n"
             code += f"        Result = {tmr_set.irq_param}_GetResult() & 0xFFF; // Результат {tmr_set.irq_param}\n"
+        elif tmr_set.irq == IRQHandler.START_DAC:
+            code += f"        {tmr_set.irq_param}_Cmd(ENABLE); // Включение {tmr_set.irq_param}\n"
+        elif tmr_set.irq == IRQHandler.STOP_DAC:
+            code += f"        {tmr_set.irq_param}_Cmd(DISABLE); // Выключение {tmr_set.irq_param}\n"
+        elif tmr_set.irq == IRQHandler.WRITE_DAC:
+            code += f"        {tmr_set.irq_param}_SetData({tmr_set.irq_param_value});\n"
 
         code += (f"        TIMER_ClearFlag(MDR_TIMER{tmr_set.tmr}, TIMER_STATUS_CNT_ARR); // Сброс флага\n"
                  "    }\n"
@@ -297,6 +324,14 @@ class Q13(Q11):
         elif tmr_set.irq == IRQHandler.READ_ADC:
             code += f"        uint32_t Result;\n"
             code += f"        Result = MDR_ADC->{tmr_set.irq_param}_RESULT & 0xFFF; // Результат {tmr_set.irq_param}\n"
+        elif tmr_set.irq == IRQHandler.START_DAC:
+            bit = 2 if tmr_set.irq_param == "DAC1" else 3
+            code += f"        MDR_DAC->CFG |= (1 << {bit}); // Включение {tmr_set.irq_param}\n"
+        elif tmr_set.irq == IRQHandler.STOP_DAC:
+            bit = 2 if tmr_set.irq_param == "DAC1" else 3
+            code += f"        MDR_DAC->CFG &=~ (1 << {bit}); // Выключение {tmr_set.irq_param}\n"
+        elif tmr_set.irq == IRQHandler.WRITE_DAC:
+            code += f"        MDR_DAC->{tmr_set.irq_param}_DATA |= {tmr_set.irq_param_value} & 0xFFF\n"
 
         code += (f"        MDR_TIMER{tmr_set.tmr}->STATUS &= ~(1 << 1); // [c. 309] Сброс флага\n"
                  "    }\n"
