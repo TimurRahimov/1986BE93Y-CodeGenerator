@@ -1,5 +1,6 @@
 import dataclasses
 import enum
+import math
 
 from PySide6.QtWidgets import QCheckBox
 
@@ -198,17 +199,18 @@ class Q13(Q11):
                 """#include "MDR32F9Qx_rst_clk.h" \n"""
                 """#include "MDR32F9Qx_timer.h" \n\n"""
                 f"#define arr {tmr_set.arr} \n"
-                f"#define psg {tmr_set.psg} \n"
-                f"unsigned Counter;\n\n")
+                f"#define psg {tmr_set.psg} \n")
 
-        code += ("// Если функция Port_setup не используется, следующая строчка не нужна\n"
-                 "void Port_setup(void);\n\n")
+        if tmr_set.irq == IRQHandler.INVERSE_OUT:
+            code += f"unsigned Counter;\n"
+
+        code += "\n"
 
         code += ("int main(void) {\n"
                  "    // Если функция Port_setup не используется, следующая строчка не нужна\n"
                  "    Port_setup();\n\n"
                  f"    RST_CLK_PCLKcmd(RST_CLK_PCLK_TIMER{tmr_set.tmr}, ENABLE); // Разрешение тактирования таймера\n"
-                 f"    TIMER_BRGInit(MDR_TIMER{tmr_set.tmr}, TIMER_HCLKdiv1); // Тактовая частота не делится\n"
+                 f"    TIMER_BRGInit(MDR_TIMER{tmr_set.tmr}, TIMER_HCLKdiv{tmr_set.m}); // M = {tmr_set.m}\n"
                  f"    TIMER_DeInit(MDR_TIMER{tmr_set.tmr}); // Полный сброс всех настроек таймера\n"
                  f"    TIMER_SetCntAutoreload(MDR_TIMER{tmr_set.tmr},  arr); // Настройка максимального значения arr\n"
                  f"    TIMER_SetCntPrescaler(MDR_TIMER{tmr_set.tmr}, psg); // Настройка предделителя psg\n"
@@ -264,12 +266,6 @@ class Q13(Q11):
                  "    }\n"
                  "}\n\n")
 
-        # code += ("void Port_setup(){\n"
-        #          "    // Данная функция не обязательна, но сюда можно вставить инициализацию "
-        #          f"необходимого порта (P{tmr_set.port}{tmr_set.pin}) для функции обработки прерываний.\n"
-        #          "    // Сгенерировать код для этой функции можно в окне \"Настройка порта\"\n"
-        #          "}\n\n")
-
         return code
 
     def __13_create_reg_code(self, tmr_set: TimerSettings) -> str:
@@ -278,16 +274,15 @@ class Q13(Q11):
                 f"#define arr {tmr_set.arr} \n"
                 f"#define psg {tmr_set.psg} \n\n")
 
-        code += ("// Если функция Port_setup не используется, следующая строчка не нужна\n"
-                 "void Port_setup(void);\n\n")
-
         code += ("int main(void) {\n"
                  "    // Если функция Port_setup не используется, следующая строчка не нужна\n"
                  "    Port_setup();\n\n"
                  f"    MDR_RST_CLK->PER_CLOCK |= (1 << {self.pclk[f'TIMER{tmr_set.tmr}']}); // [с. 175] Разрешение тактирования TIMER{tmr_set.tmr}\n"
-                 f"    MDR_RST_CLK->TIM_CLOCK |= (1 << {23 + tmr_set.tmr}); // [c. 177] Разрешение тактовой частоты на TIM{tmr_set.tmr}\n"
-                 f"    MDR_RST_CLK->TIM_CLOCK &= ~(7 << {8 * (tmr_set.tmr - 1)}); // [c. 177] Тактовая частота не делится\n"
-                 f"    MDR_TIMER{tmr_set.tmr}->CNTRL &= ~(1 << 0); // [с. 301] Выключение таймера для настройки \n"
+                 f"    MDR_RST_CLK->TIM_CLOCK |= (1 << {23 + tmr_set.tmr}); // [c. 177] Разрешение тактовой частоты на TIM{tmr_set.tmr}\n")
+
+        code += f"    MDR_RST_CLK->TIM_CLOCK |= ({int(math.log(tmr_set.m, 2))} << {8 * (tmr_set.tmr - 1)}); // M = {tmr_set.m}\n" if tmr_set.m != 1 else ""
+
+        code += (f"    MDR_TIMER{tmr_set.tmr}->CNTRL &= ~(1 << 0); // [с. 301] Выключение таймера для настройки \n"
                  f"    MDR_TIMER{tmr_set.tmr}->CNTRL &= ~(1 << 3); // [с. 301] Направление счета вверх (DIR=0) \n"
                  f"    MDR_TIMER{tmr_set.tmr}->PSG = psg; // [с. 300] Настройка предделителя \n"
                  f"    MDR_TIMER{tmr_set.tmr}->ARR = arr; // [с. 300] Максимальное значение счета таймера (основание счета) \n"
@@ -346,11 +341,5 @@ class Q13(Q11):
         code += (f"        MDR_TIMER{tmr_set.tmr}->STATUS &= ~(1 << 1); // [c. 309] Сброс флага\n"
                  "    }\n"
                  "}\n\n")
-
-        # code += ("void Port_setup(){\n"
-        #          "    // Данная функция не обязательна, но сюда можно вставить инициализацию "
-        #          f"необходимого порта (P{tmr_set.port}{tmr_set.pin}) для функции обработки прерываний.\n"
-        #          "    // Сгенерировать код для этой функции можно в окне \"Настройка порта\"\n"
-        #          "}\n\n")
 
         return code
